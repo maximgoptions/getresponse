@@ -17,6 +17,7 @@
       <parameter key="DoctrineBundle">Doctrine\Bundle\DoctrineBundle\DoctrineBundle</parameter>
       <parameter key="SensioFrameworkExtraBundle">Sensio\Bundle\FrameworkExtraBundle\SensioFrameworkExtraBundle</parameter>
       <parameter key="AppBundle">AppBundle\AppBundle</parameter>
+      <parameter key="Getresponse360ApiBundle">Getresponse360\ApiBundle\Getresponse360ApiBundle</parameter>
       <parameter key="DebugBundle">Symfony\Bundle\DebugBundle\DebugBundle</parameter>
       <parameter key="AcmeDemoBundle">Acme\DemoBundle\AcmeDemoBundle</parameter>
       <parameter key="WebProfilerBundle">Symfony\Bundle\WebProfilerBundle\WebProfilerBundle</parameter>
@@ -2978,6 +2979,10 @@
       <call method="addPath">
         <argument>/Users/max/sites/getresponse/vendor/doctrine/doctrine-bundle/Resources/views</argument>
         <argument>Doctrine</argument>
+      </call>
+      <call method="addPath">
+        <argument>/Users/max/sites/getresponse/src/Getresponse360/ApiBundle/Resources/views</argument>
+        <argument>Getresponse360Api</argument>
       </call>
       <call method="addPath">
         <argument>/Users/max/sites/getresponse/vendor/symfony/symfony/src/Symfony/Bundle/DebugBundle/Resources/views</argument>

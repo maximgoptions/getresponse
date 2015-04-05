@@ -1,3 +1,8 @@
+getresponse360_user:
+    resource: "@Getresponse360UserBundle/Controller/"
+    type:     annotation
+    prefix:   /
+
 getresponse360_api:
     resource: "@Getresponse360ApiBundle/Controller/"
     type:     annotation
