@@ -2,33 +2,25 @@
 
 namespace Getresponse360\UserBundle\Entity;
 
+use FOS\UserBundle\Model\User as BaseUser;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * User
- *
- * @ORM\Table()
  * @ORM\Entity
+ * @ORM\Table(name="user")
  */
-class User
+class User extends BaseUser
 {
     /**
-     * @var integer
-     *
-     * @ORM\Column(name="id", type="integer")
      * @ORM\Id
+     * @ORM\Column(type="integer")
      * @ORM\GeneratedValue(strategy="AUTO")
      */
-    private $id;
+    protected $id;
 
-
-    /**
-     * Get id
-     *
-     * @return integer 
-     */
-    public function getId()
+    public function __construct()
     {
-        return $this->id;
+        parent::__construct();
+        // your own logic
     }
 }
