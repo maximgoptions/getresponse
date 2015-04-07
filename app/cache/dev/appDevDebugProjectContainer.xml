@@ -525,11 +525,13 @@
     <parameter key="doctrine.class">Doctrine\Bundle\DoctrineBundle\Registry</parameter>
     <parameter key="doctrine.entity_managers" type="collection">
       <parameter key="default">doctrine.orm.default_entity_manager</parameter>
+      <parameter key="goptions_platform">doctrine.orm.goptions_platform_entity_manager</parameter>
     </parameter>
     <parameter key="doctrine.default_entity_manager">default</parameter>
     <parameter key="doctrine.dbal.connection_factory.types" type="collection"/>
     <parameter key="doctrine.connections" type="collection">
       <parameter key="default">doctrine.dbal.default_connection</parameter>
+      <parameter key="goptions_platform">doctrine.dbal.goptions_platform_connection</parameter>
     </parameter>
     <parameter key="doctrine.default_connection">default</parameter>
     <parameter key="doctrine.orm.configuration.class">Doctrine\ORM\Configuration</parameter>
@@ -1557,6 +1559,10 @@
               <argument>default</argument>
               <argument type="service" id="doctrine.dbal.logger.profiling.default"/>
             </call>
+            <call method="addLogger">
+              <argument>goptions_platform</argument>
+              <argument type="service" id="doctrine.dbal.logger.profiling.goptions_platform"/>
+            </call>
           </service>
         </argument>
       </call>
@@ -1875,7 +1881,7 @@
         </argument>
         <argument type="service">
           <service class="Symfony\Component\Security\Core\Authentication\Provider\AnonymousAuthenticationProvider" public="false">
-            <argument>5523cd8e53403</argument>
+            <argument>5523cecf037a1</argument>
           </service>
         </argument>
       </argument>
@@ -2154,7 +2160,7 @@
         <argument type="service">
           <service class="Symfony\Component\Security\Http\Firewall\AnonymousAuthenticationListener" public="false">
             <argument type="service" id="security.context"/>
-            <argument>5523cd8e53403</argument>
+            <argument>5523cecf037a1</argument>
             <argument type="service" id="monolog.logger.security" on-invalid="null"/>
             <argument type="service" id="security.authentication.manager"/>
           </service>
@@ -2563,6 +2569,11 @@
     <service id="assetic.request_listener" class="Symfony\Bundle\AsseticBundle\EventListener\RequestListener">
       <tag name="kernel.event_listener" event="kernel.request" method="onKernelRequest"/>
     </service>
+    <service id="doctrine.dbal.logger" class="Symfony\Bridge\Doctrine\Logger\DbalLogger" public="false">
+      <tag name="monolog.logger" channel="doctrine"/>
+      <argument type="service" id="monolog.logger.doctrine" on-invalid="null"/>
+      <argument type="service" id="debug.stopwatch" on-invalid="null"/>
+    </service>
     <service id="doctrine.dbal.connection_factory" class="Doctrine\Bundle\DoctrineBundle\ConnectionFactory">
       <argument type="collection"/>
     </service>
@@ -2570,9 +2581,11 @@
       <argument type="service" id="service_container"/>
       <argument type="collection">
         <argument key="default">doctrine.dbal.default_connection</argument>
+        <argument key="goptions_platform">doctrine.dbal.goptions_platform_connection</argument>
       </argument>
       <argument type="collection">
         <argument key="default">doctrine.orm.default_entity_manager</argument>
+        <argument key="goptions_platform">doctrine.orm.goptions_platform_entity_manager</argument>
       </argument>
       <argument>default</argument>
       <argument>default</argument>
@@ -2595,13 +2608,7 @@
             <argument type="service">
               <service class="Doctrine\DBAL\Logging\LoggerChain" public="false">
                 <call method="addLogger">
-                  <argument type="service">
-                    <service class="Symfony\Bridge\Doctrine\Logger\DbalLogger" public="false">
-                      <tag name="monolog.logger" channel="doctrine"/>
-                      <argument type="service" id="monolog.logger.doctrine" on-invalid="null"/>
-                      <argument type="service" id="debug.stopwatch" on-invalid="null"/>
-                    </service>
-                  </argument>
+                  <argument type="service" id="doctrine.dbal.logger"/>
                 </call>
                 <call method="addLogger">
                   <argument type="service" id="doctrine.dbal.logger.profiling.default"/>
@@ -2615,16 +2622,53 @@
         <service class="Symfony\Bridge\Doctrine\ContainerAwareEventManager" public="false">
           <argument type="service" id="service_container"/>
           <call method="addEventSubscriber">
+            <argument type="service" id="fos_user.user_listener"/>
+          </call>
+        </service>
+      </argument>
+      <argument type="collection"/>
+      <factory service="doctrine.dbal.connection_factory" method="createConnection"/>
+    </service>
+    <service id="doctrine.dbal.logger.profiling.goptions_platform" class="Doctrine\DBAL\Logging\DebugStack" public="false"/>
+    <service id="doctrine.dbal.goptions_platform_connection" class="Doctrine\DBAL\Connection">
+      <argument type="collection">
+        <argument key="driver">pdo_mysql</argument>
+        <argument key="host">localhost</argument>
+        <argument key="port">3306</argument>
+        <argument key="dbname">goptions_platform</argument>
+        <argument key="user">root</argument>
+        <argument key="password">password</argument>
+        <argument key="charset">UTF8</argument>
+        <argument key="driverOptions" type="collection"/>
+      </argument>
+      <argument type="service">
+        <service class="Doctrine\DBAL\Configuration" public="false">
+          <call method="setSQLLogger">
             <argument type="service">
-              <service class="FOS\UserBundle\Doctrine\Orm\UserListener" public="false">
-                <tag name="doctrine.event_subscriber"/>
-                <argument type="service" id="service_container"/>
+              <service class="Doctrine\DBAL\Logging\LoggerChain" public="false">
+                <call method="addLogger">
+                  <argument type="service" id="doctrine.dbal.logger"/>
+                </call>
+                <call method="addLogger">
+                  <argument type="service" id="doctrine.dbal.logger.profiling.goptions_platform"/>
+                </call>
               </service>
             </argument>
           </call>
         </service>
       </argument>
-      <argument type="collection"/>
+      <argument type="service">
+        <service class="Symfony\Bridge\Doctrine\ContainerAwareEventManager" public="false">
+          <argument type="service" id="service_container"/>
+          <call method="addEventSubscriber">
+            <argument type="service" id="fos_user.user_listener"/>
+          </call>
+        </service>
+      </argument>
+      <argument type="collection">
+        <argument key="enum">string</argument>
+        <argument key="bit">float</argument>
+      </argument>
       <factory service="doctrine.dbal.connection_factory" method="createConnection"/>
     </service>
     <service id="form.type_guesser.doctrine" class="Symfony\Bridge\Doctrine\Form\DoctrineOrmTypeGuesser">
@@ -2643,6 +2687,7 @@
       <tag name="validator.initializer"/>
       <argument type="service" id="doctrine"/>
     </service>
+    <service id="doctrine.orm.naming_strategy.default" class="Doctrine\ORM\Mapping\DefaultNamingStrategy" public="false"/>
     <service id="doctrine_cache.providers.doctrine.orm.default_metadata_cache" class="Doctrine\Common\Cache\ArrayCache">
       <call method="setNamespace">
         <argument>sf2orm_default_95457cabc0d572d0436c2371327b57af1a5bcc3e066b73bb5e4d94c81e05c466</argument>
@@ -2670,8 +2715,6 @@
           <call method="setEntityNamespaces">
             <argument type="collection">
               <argument key="Getresponse360UserBundle">Getresponse360\UserBundle\Entity</argument>
-              <argument key="Getresponse360GetresponseBundle">Getresponse360\GetresponseBundle\Entity</argument>
-              <argument key="Getresponse360ReplicatorBundle">Getresponse360\ReplicatorBundle\Entity</argument>
             </argument>
           </call>
           <call method="setMetadataCacheImpl">
@@ -2692,38 +2735,10 @@
                       <argument type="service" id="annotation_reader"/>
                       <argument type="collection">
                         <argument>/Users/max/sites/getresponse/src/Getresponse360/UserBundle/Entity</argument>
-                        <argument>/Users/max/sites/getresponse/src/Getresponse360/GetresponseBundle/Entity</argument>
-                        <argument>/Users/max/sites/getresponse/src/Getresponse360/ReplicatorBundle/Entity</argument>
                       </argument>
                     </service>
                   </argument>
                   <argument>Getresponse360\UserBundle\Entity</argument>
-                </call>
-                <call method="addDriver">
-                  <argument type="service">
-                    <service class="Doctrine\ORM\Mapping\Driver\AnnotationDriver" public="false">
-                      <argument type="service" id="annotation_reader"/>
-                      <argument type="collection">
-                        <argument>/Users/max/sites/getresponse/src/Getresponse360/UserBundle/Entity</argument>
-                        <argument>/Users/max/sites/getresponse/src/Getresponse360/GetresponseBundle/Entity</argument>
-                        <argument>/Users/max/sites/getresponse/src/Getresponse360/ReplicatorBundle/Entity</argument>
-                      </argument>
-                    </service>
-                  </argument>
-                  <argument>Getresponse360\GetresponseBundle\Entity</argument>
-                </call>
-                <call method="addDriver">
-                  <argument type="service">
-                    <service class="Doctrine\ORM\Mapping\Driver\AnnotationDriver" public="false">
-                      <argument type="service" id="annotation_reader"/>
-                      <argument type="collection">
-                        <argument>/Users/max/sites/getresponse/src/Getresponse360/UserBundle/Entity</argument>
-                        <argument>/Users/max/sites/getresponse/src/Getresponse360/GetresponseBundle/Entity</argument>
-                        <argument>/Users/max/sites/getresponse/src/Getresponse360/ReplicatorBundle/Entity</argument>
-                      </argument>
-                    </service>
-                  </argument>
-                  <argument>Getresponse360\ReplicatorBundle\Entity</argument>
                 </call>
                 <call method="addDriver">
                   <argument type="service">
@@ -2759,9 +2774,7 @@
             <argument>Doctrine\ORM\EntityRepository</argument>
           </call>
           <call method="setNamingStrategy">
-            <argument type="service">
-              <service class="Doctrine\ORM\Mapping\DefaultNamingStrategy" public="false"/>
-            </argument>
+            <argument type="service" id="doctrine.orm.naming_strategy.default"/>
           </call>
           <call method="setEntityListenerResolver">
             <argument type="service" id="doctrine.orm.default_entity_listener_resolver"/>
@@ -2770,6 +2783,87 @@
       </argument>
       <factory class="Doctrine\ORM\EntityManager" method="create"/>
       <configurator service="doctrine.orm.default_manager_configurator" method="configure"/>
+    </service>
+    <service id="doctrine_cache.providers.doctrine.orm.goptions_platform_metadata_cache" class="Doctrine\Common\Cache\ArrayCache">
+      <call method="setNamespace">
+        <argument>sf2orm_goptions_platform_95457cabc0d572d0436c2371327b57af1a5bcc3e066b73bb5e4d94c81e05c466</argument>
+      </call>
+    </service>
+    <service id="doctrine_cache.providers.doctrine.orm.goptions_platform_result_cache" class="Doctrine\Common\Cache\ArrayCache">
+      <call method="setNamespace">
+        <argument>sf2orm_goptions_platform_95457cabc0d572d0436c2371327b57af1a5bcc3e066b73bb5e4d94c81e05c466</argument>
+      </call>
+    </service>
+    <service id="doctrine_cache.providers.doctrine.orm.goptions_platform_query_cache" class="Doctrine\Common\Cache\ArrayCache">
+      <call method="setNamespace">
+        <argument>sf2orm_goptions_platform_95457cabc0d572d0436c2371327b57af1a5bcc3e066b73bb5e4d94c81e05c466</argument>
+      </call>
+    </service>
+    <service id="doctrine.orm.goptions_platform_entity_listener_resolver" class="Doctrine\ORM\Mapping\DefaultEntityListenerResolver"/>
+    <service id="doctrine.orm.goptions_platform_manager_configurator" class="Doctrine\Bundle\DoctrineBundle\ManagerConfigurator">
+      <argument type="collection"/>
+      <argument type="collection"/>
+    </service>
+    <service id="doctrine.orm.goptions_platform_entity_manager" class="Doctrine\ORM\EntityManager">
+      <argument type="service" id="doctrine.dbal.goptions_platform_connection"/>
+      <argument type="service">
+        <service class="Doctrine\ORM\Configuration" public="false">
+          <call method="setEntityNamespaces">
+            <argument type="collection">
+              <argument key="Getresponse360ReplicatorBundle">Getresponse360\ReplicatorBundle\Entity</argument>
+            </argument>
+          </call>
+          <call method="setMetadataCacheImpl">
+            <argument type="service" id="doctrine_cache.providers.doctrine.orm.goptions_platform_metadata_cache"/>
+          </call>
+          <call method="setQueryCacheImpl">
+            <argument type="service" id="doctrine_cache.providers.doctrine.orm.goptions_platform_query_cache"/>
+          </call>
+          <call method="setResultCacheImpl">
+            <argument type="service" id="doctrine_cache.providers.doctrine.orm.goptions_platform_result_cache"/>
+          </call>
+          <call method="setMetadataDriverImpl">
+            <argument type="service">
+              <service class="Doctrine\Common\Persistence\Mapping\Driver\MappingDriverChain" public="false">
+                <call method="addDriver">
+                  <argument type="service">
+                    <service class="Doctrine\ORM\Mapping\Driver\AnnotationDriver" public="false">
+                      <argument type="service" id="annotation_reader"/>
+                      <argument type="collection">
+                        <argument>/Users/max/sites/getresponse/src/Getresponse360/ReplicatorBundle/Entity</argument>
+                      </argument>
+                    </service>
+                  </argument>
+                  <argument>Getresponse360\ReplicatorBundle\Entity</argument>
+                </call>
+              </service>
+            </argument>
+          </call>
+          <call method="setProxyDir">
+            <argument>/Users/max/sites/getresponse/app/cache/dev/doctrine/orm/Proxies</argument>
+          </call>
+          <call method="setProxyNamespace">
+            <argument>Proxies</argument>
+          </call>
+          <call method="setAutoGenerateProxyClasses">
+            <argument>true</argument>
+          </call>
+          <call method="setClassMetadataFactoryName">
+            <argument>Doctrine\ORM\Mapping\ClassMetadataFactory</argument>
+          </call>
+          <call method="setDefaultRepositoryClassName">
+            <argument>Doctrine\ORM\EntityRepository</argument>
+          </call>
+          <call method="setNamingStrategy">
+            <argument type="service" id="doctrine.orm.naming_strategy.default"/>
+          </call>
+          <call method="setEntityListenerResolver">
+            <argument type="service" id="doctrine.orm.goptions_platform_entity_listener_resolver"/>
+          </call>
+        </service>
+      </argument>
+      <factory class="Doctrine\ORM\EntityManager" method="create"/>
+      <configurator service="doctrine.orm.goptions_platform_manager_configurator" method="configure"/>
     </service>
     <service id="sensio_framework_extra.view.guesser" class="Sensio\Bundle\FrameworkExtraBundle\Templating\TemplateGuesser">
       <argument type="service" id="kernel"/>
@@ -2819,6 +2913,10 @@
       <argument type="service" id="security.role_hierarchy" on-invalid="null"/>
       <argument type="service" id="security.token_storage" on-invalid="null"/>
       <argument type="service" id="security.authorization_checker" on-invalid="null"/>
+    </service>
+    <service id="fos_user.user_listener" class="FOS\UserBundle\Doctrine\Orm\UserListener" public="false">
+      <tag name="doctrine.event_subscriber"/>
+      <argument type="service" id="service_container"/>
     </service>
     <service id="fos_user.security.interactive_login_listener" class="FOS\UserBundle\EventListener\LastLoginListener">
       <tag name="kernel.event_subscriber"/>
@@ -3437,6 +3535,9 @@
     <service id="doctrine.orm.default_metadata_cache" alias="doctrine_cache.providers.doctrine.orm.default_metadata_cache"/>
     <service id="doctrine.orm.default_result_cache" alias="doctrine_cache.providers.doctrine.orm.default_result_cache"/>
     <service id="doctrine.orm.default_query_cache" alias="doctrine_cache.providers.doctrine.orm.default_query_cache"/>
+    <service id="doctrine.orm.goptions_platform_metadata_cache" alias="doctrine_cache.providers.doctrine.orm.goptions_platform_metadata_cache"/>
+    <service id="doctrine.orm.goptions_platform_result_cache" alias="doctrine_cache.providers.doctrine.orm.goptions_platform_result_cache"/>
+    <service id="doctrine.orm.goptions_platform_query_cache" alias="doctrine_cache.providers.doctrine.orm.goptions_platform_query_cache"/>
     <service id="fos_user.util.username_canonicalizer" alias="fos_user.util.email_canonicalizer"/>
     <service id="sensio.distribution.webconfigurator" alias="sensio_distribution.webconfigurator"/>
     <service id="console.command.sensiolabs_security_command_securitycheckercommand" alias="sensio_distribution.security_checker.command"/>
