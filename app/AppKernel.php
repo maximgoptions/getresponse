@@ -19,8 +19,8 @@ class AppKernel extends Kernel
             new AppBundle\AppBundle(),
             new Getresponse360\ApiBundle\Getresponse360ApiBundle(),
             new Getresponse360\UserBundle\Getresponse360UserBundle(),
-            new Getresponse360\GetresponseBundle\Getresponse360ApiBundle(),
-            new Getresponse360\UserBundle\Getresponse360UserBundle(),
+            new Getresponse360\GetresponseBundle\Getresponse360GetresponseBundle(),
+            new Getresponse360\ReplicatorBundle\Getresponse360ReplicatorBundle(),
             new FOS\UserBundle\FOSUserBundle(),
         );
 

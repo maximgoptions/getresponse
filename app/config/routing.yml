@@ -8,6 +8,11 @@ getresponse360_api:
     type:     annotation
     prefix:   /
 
+getresponse360_get:
+    resource: "@Getresponse360GetresponseBundle/Controller/"
+    type:     annotation
+    prefix:   /
+
 app:
     resource: "@AppBundle/Controller/"
     type:     annotation
