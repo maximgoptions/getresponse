@@ -7,12 +7,12 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity
- * @ORM\Table(name="user")
+ * @ORM\Table(name="login")
  */
 class User extends BaseUser
 {
     /**
-     * @ORM\Id
+     * @ORM\id
      * @ORM\Column(type="integer")
      * @ORM\GeneratedValue(strategy="AUTO")
      */

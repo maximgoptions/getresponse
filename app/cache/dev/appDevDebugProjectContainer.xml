@@ -29,17 +29,23 @@
     <parameter key="kernel.charset">UTF-8</parameter>
     <parameter key="kernel.container_class">appDevDebugProjectContainer</parameter>
     <parameter key="database_driver">pdo_mysql</parameter>
-    <parameter key="database_host">127.0.0.1</parameter>
-    <parameter key="database_port">null</parameter>
-    <parameter key="database_name">symfony</parameter>
+    <parameter key="database_host">localhost</parameter>
+    <parameter key="database_port">3306</parameter>
+    <parameter key="database_name">getresponse360</parameter>
     <parameter key="database_user">root</parameter>
-    <parameter key="database_password">null</parameter>
+    <parameter key="database_password">password</parameter>
     <parameter key="mailer_transport">smtp</parameter>
     <parameter key="mailer_host">127.0.0.1</parameter>
     <parameter key="mailer_user">null</parameter>
     <parameter key="mailer_password">null</parameter>
     <parameter key="locale">en</parameter>
     <parameter key="secret">103cced6877e403da096461c1fa2a3d3df188a8e</parameter>
+    <parameter key="database_replicator_driver">pdo_mysql</parameter>
+    <parameter key="database_replicator_host">localhost</parameter>
+    <parameter key="database_replicator_port">3306</parameter>
+    <parameter key="database_replicator_name">goptions_platform</parameter>
+    <parameter key="database_replicator_user">root</parameter>
+    <parameter key="database_replicator_password">password</parameter>
     <parameter key="controller_resolver.class">Symfony\Bundle\FrameworkBundle\Controller\ControllerResolver</parameter>
     <parameter key="controller_name_converter.class">Symfony\Bundle\FrameworkBundle\Controller\ControllerNameParser</parameter>
     <parameter key="response_listener.class">Symfony\Component\HttpKernel\EventListener\ResponseListener</parameter>
@@ -298,9 +304,7 @@
         <parameter>ROLE_USER</parameter>
       </parameter>
       <parameter key="ROLE_SUPER_ADMIN" type="collection">
-        <parameter>ROLE_USER</parameter>
         <parameter>ROLE_ADMIN</parameter>
-        <parameter>ROLE_ALLOWED_TO_SWITCH</parameter>
       </parameter>
     </parameter>
     <parameter key="twig.class">Twig_Environment</parameter>
@@ -464,7 +468,7 @@
     <parameter key="assetic.write_to">/Users/max/sites/getresponse/app/../web</parameter>
     <parameter key="assetic.variables" type="collection"/>
     <parameter key="assetic.java.bin">/usr/bin/java</parameter>
-    <parameter key="assetic.node.bin">/usr/local/bin/node</parameter>
+    <parameter key="assetic.node.bin">/usr/bin/node</parameter>
     <parameter key="assetic.ruby.bin">/usr/bin/ruby</parameter>
     <parameter key="assetic.sass.bin">/usr/bin/sass</parameter>
     <parameter key="assetic.filter.cssrewrite.class">Assetic\Filter\CssRewriteFilter</parameter>
@@ -1860,11 +1864,16 @@
       <argument type="collection">
         <argument type="service">
           <service class="Symfony\Component\Security\Core\Authentication\Provider\DaoAuthenticationProvider" public="false">
-            <argument type="service" id="security.user.provider.concrete.in_memory"/>
+            <argument type="service" id="fos_user.user_provider.username"/>
             <argument type="service" id="security.user_checker"/>
-            <argument>demo_secured_area</argument>
+            <argument>main</argument>
             <argument type="service" id="security.encoder_factory"/>
             <argument>true</argument>
+          </service>
+        </argument>
+        <argument type="service">
+          <service class="Symfony\Component\Security\Core\Authentication\Provider\AnonymousAuthenticationProvider" public="false">
+            <argument>5523c7aeda5a2</argument>
           </service>
         </argument>
       </argument>
@@ -1919,9 +1928,7 @@
           <argument>ROLE_USER</argument>
         </argument>
         <argument key="ROLE_SUPER_ADMIN" type="collection">
-          <argument>ROLE_USER</argument>
           <argument>ROLE_ADMIN</argument>
-          <argument>ROLE_ALLOWED_TO_SWITCH</argument>
         </argument>
       </argument>
     </service>
@@ -1931,19 +1938,9 @@
         <service class="Symfony\Bundle\SecurityBundle\Security\FirewallMap" public="false">
           <argument type="service" id="service_container"/>
           <argument type="collection">
-            <argument key="security.firewall.map.context.dev" type="service">
+            <argument key="security.firewall.map.context.main" type="service">
               <service class="Symfony\Component\HttpFoundation\RequestMatcher" public="false">
-                <argument>^/(_(profiler|wdt)|css|images|js)/</argument>
-              </service>
-            </argument>
-            <argument key="security.firewall.map.context.demo_login" type="service">
-              <service class="Symfony\Component\HttpFoundation\RequestMatcher" public="false">
-                <argument>^/demo/secured/login$</argument>
-              </service>
-            </argument>
-            <argument key="security.firewall.map.context.demo_secured_area" type="service">
-              <service class="Symfony\Component\HttpFoundation\RequestMatcher" public="false">
-                <argument>^/demo/secured/</argument>
+                <argument>^/</argument>
               </service>
             </argument>
           </argument>
@@ -1964,8 +1961,8 @@
       <argument type="service" id="service_container"/>
       <argument type="service" id="router"/>
       <call method="registerListener">
-        <argument>demo_secured_area</argument>
-        <argument>_demo_logout</argument>
+        <argument>main</argument>
+        <argument>/logout</argument>
         <argument>logout</argument>
         <argument>_csrf_token</argument>
         <argument>null</argument>
@@ -1975,45 +1972,58 @@
       <tag name="templating.helper" alias="security"/>
       <argument type="service" id="security.context" on-invalid="ignore"/>
     </service>
-    <service id="security.user.provider.concrete.in_memory" class="Symfony\Component\Security\Core\User\InMemoryUserProvider" public="false">
-      <call method="createUser">
-        <argument type="service">
-          <service class="Symfony\Component\Security\Core\User\User" public="false">
-            <argument>user</argument>
-            <argument>userpass</argument>
-            <argument type="collection">
-              <argument>ROLE_USER</argument>
-            </argument>
-          </service>
-        </argument>
-      </call>
-      <call method="createUser">
-        <argument type="service">
-          <service class="Symfony\Component\Security\Core\User\User" public="false">
-            <argument>admin</argument>
-            <argument>adminpass</argument>
-            <argument type="collection">
-              <argument>ROLE_ADMIN</argument>
-            </argument>
-          </service>
-        </argument>
-      </call>
-    </service>
-    <service id="security.firewall.map.context.dev" class="Symfony\Bundle\SecurityBundle\Security\FirewallContext">
-      <argument type="collection"/>
-      <argument>null</argument>
-    </service>
-    <service id="security.firewall.map.context.demo_login" class="Symfony\Bundle\SecurityBundle\Security\FirewallContext">
-      <argument type="collection"/>
-      <argument>null</argument>
-    </service>
-    <service id="security.firewall.map.context.demo_secured_area" class="Symfony\Bundle\SecurityBundle\Security\FirewallContext">
+    <service id="security.firewall.map.context.main" class="Symfony\Bundle\SecurityBundle\Security\FirewallContext">
       <argument type="collection">
         <argument type="service">
           <service class="Symfony\Component\Security\Http\Firewall\ChannelListener" public="false">
             <tag name="monolog.logger" channel="security"/>
             <argument type="service">
-              <service class="Symfony\Component\Security\Http\AccessMap" public="false"/>
+              <service class="Symfony\Component\Security\Http\AccessMap" public="false">
+                <call method="add">
+                  <argument type="service">
+                    <service class="Symfony\Component\HttpFoundation\RequestMatcher" public="false">
+                      <argument>^/login$</argument>
+                    </service>
+                  </argument>
+                  <argument type="collection">
+                    <argument>IS_AUTHENTICATED_ANONYMOUSLY</argument>
+                  </argument>
+                  <argument>null</argument>
+                </call>
+                <call method="add">
+                  <argument type="service">
+                    <service class="Symfony\Component\HttpFoundation\RequestMatcher" public="false">
+                      <argument>^/register</argument>
+                    </service>
+                  </argument>
+                  <argument type="collection">
+                    <argument>IS_AUTHENTICATED_ANONYMOUSLY</argument>
+                  </argument>
+                  <argument>null</argument>
+                </call>
+                <call method="add">
+                  <argument type="service">
+                    <service class="Symfony\Component\HttpFoundation\RequestMatcher" public="false">
+                      <argument>^/resetting</argument>
+                    </service>
+                  </argument>
+                  <argument type="collection">
+                    <argument>IS_AUTHENTICATED_ANONYMOUSLY</argument>
+                  </argument>
+                  <argument>null</argument>
+                </call>
+                <call method="add">
+                  <argument type="service">
+                    <service class="Symfony\Component\HttpFoundation\RequestMatcher" public="false">
+                      <argument>^/admin/</argument>
+                    </service>
+                  </argument>
+                  <argument type="collection">
+                    <argument>ROLE_ADMIN</argument>
+                  </argument>
+                  <argument>null</argument>
+                </call>
+              </service>
             </argument>
             <argument type="service">
               <service class="Symfony\Component\Security\Http\EntryPoint\RetryAuthenticationEntryPoint" public="false">
@@ -2028,9 +2038,9 @@
           <service class="Symfony\Component\Security\Http\Firewall\ContextListener" public="false">
             <argument type="service" id="security.context"/>
             <argument type="collection">
-              <argument type="service" id="security.user.provider.concrete.in_memory"/>
+              <argument type="service" id="fos_user.user_provider.username"/>
             </argument>
-            <argument>demo_secured_area</argument>
+            <argument>main</argument>
             <argument type="service" id="monolog.logger.security" on-invalid="null"/>
             <argument type="service" id="debug.event_dispatcher" on-invalid="null"/>
           </service>
@@ -2052,13 +2062,13 @@
                     <argument type="service" id="router" on-invalid="null"/>
                   </service>
                 </argument>
-                <argument>_demo</argument>
+                <argument>/</argument>
               </service>
             </argument>
             <argument type="collection">
               <argument key="csrf_parameter">_csrf_token</argument>
               <argument key="intention">logout</argument>
-              <argument key="logout_path">_demo_logout</argument>
+              <argument key="logout_path">/logout</argument>
             </argument>
             <call method="addHandler">
               <argument type="service">
@@ -2069,7 +2079,7 @@
         </argument>
         <argument type="service">
           <service class="Symfony\Component\Security\Http\Firewall\UsernamePasswordFormAuthenticationListener" public="false">
-            <tag name="security.remember_me_aware" id="demo_secured_area" provider="security.user.provider.concrete.in_memory"/>
+            <tag name="security.remember_me_aware" id="main" provider="security.user.provider.concrete.fos_userbundle"/>
             <argument type="service" id="security.context"/>
             <argument type="service" id="security.authentication.manager"/>
             <argument type="service" id="security.authentication.session_strategy"/>
@@ -2079,7 +2089,7 @@
                 <argument type="service" id="router" on-invalid="null"/>
               </service>
             </argument>
-            <argument>demo_secured_area</argument>
+            <argument>main</argument>
             <argument type="service">
               <service class="Symfony\Component\Security\Http\Authentication\DefaultAuthenticationSuccessHandler" public="false">
                 <argument type="service">
@@ -2091,15 +2101,15 @@
                 <argument type="collection"/>
                 <call method="setOptions">
                   <argument type="collection">
-                    <argument key="login_path">_demo_login</argument>
                     <argument key="always_use_default_target_path">false</argument>
                     <argument key="default_target_path">/</argument>
+                    <argument key="login_path">/login</argument>
                     <argument key="target_path_parameter">_target_path</argument>
                     <argument key="use_referer">false</argument>
                   </argument>
                 </call>
                 <call method="setProviderKey">
-                  <argument>demo_secured_area</argument>
+                  <argument>main</argument>
                 </call>
               </service>
             </argument>
@@ -2116,7 +2126,7 @@
                 <argument type="service" id="monolog.logger.security" on-invalid="null"/>
                 <call method="setOptions">
                   <argument type="collection">
-                    <argument key="login_path">_demo_login</argument>
+                    <argument key="login_path">/login</argument>
                     <argument key="failure_path">null</argument>
                     <argument key="failure_forward">false</argument>
                     <argument key="failure_path_parameter">_failure_path</argument>
@@ -2125,7 +2135,7 @@
               </service>
             </argument>
             <argument type="collection">
-              <argument key="check_path">_demo_security_check</argument>
+              <argument key="check_path">/login_check</argument>
               <argument key="use_forward">false</argument>
               <argument key="require_previous_session">true</argument>
               <argument key="username_parameter">_username</argument>
@@ -2136,7 +2146,15 @@
             </argument>
             <argument type="service" id="monolog.logger.security" on-invalid="null"/>
             <argument type="service" id="debug.event_dispatcher" on-invalid="null"/>
-            <argument>null</argument>
+            <argument type="service" id="form.csrf_provider"/>
+          </service>
+        </argument>
+        <argument type="service">
+          <service class="Symfony\Component\Security\Http\Firewall\AnonymousAuthenticationListener" public="false">
+            <argument type="service" id="security.context"/>
+            <argument>5523c7aeda5a2</argument>
+            <argument type="service" id="monolog.logger.security" on-invalid="null"/>
+            <argument type="service" id="security.authentication.manager"/>
           </service>
         </argument>
         <argument type="service">
@@ -2145,7 +2163,52 @@
             <argument type="service" id="security.context"/>
             <argument type="service" id="security.access.decision_manager"/>
             <argument type="service">
-              <service class="Symfony\Component\Security\Http\AccessMap" public="false"/>
+              <service class="Symfony\Component\Security\Http\AccessMap" public="false">
+                <call method="add">
+                  <argument type="service">
+                    <service class="Symfony\Component\HttpFoundation\RequestMatcher" public="false">
+                      <argument>^/login$</argument>
+                    </service>
+                  </argument>
+                  <argument type="collection">
+                    <argument>IS_AUTHENTICATED_ANONYMOUSLY</argument>
+                  </argument>
+                  <argument>null</argument>
+                </call>
+                <call method="add">
+                  <argument type="service">
+                    <service class="Symfony\Component\HttpFoundation\RequestMatcher" public="false">
+                      <argument>^/register</argument>
+                    </service>
+                  </argument>
+                  <argument type="collection">
+                    <argument>IS_AUTHENTICATED_ANONYMOUSLY</argument>
+                  </argument>
+                  <argument>null</argument>
+                </call>
+                <call method="add">
+                  <argument type="service">
+                    <service class="Symfony\Component\HttpFoundation\RequestMatcher" public="false">
+                      <argument>^/resetting</argument>
+                    </service>
+                  </argument>
+                  <argument type="collection">
+                    <argument>IS_AUTHENTICATED_ANONYMOUSLY</argument>
+                  </argument>
+                  <argument>null</argument>
+                </call>
+                <call method="add">
+                  <argument type="service">
+                    <service class="Symfony\Component\HttpFoundation\RequestMatcher" public="false">
+                      <argument>^/admin/</argument>
+                    </service>
+                  </argument>
+                  <argument type="collection">
+                    <argument>ROLE_ADMIN</argument>
+                  </argument>
+                  <argument>null</argument>
+                </call>
+              </service>
             </argument>
             <argument type="service" id="security.authentication.manager"/>
           </service>
@@ -2161,7 +2224,7 @@
               <argument type="service" id="router" on-invalid="null"/>
             </service>
           </argument>
-          <argument>demo_secured_area</argument>
+          <argument>main</argument>
           <argument type="service">
             <service class="Symfony\Component\Security\Http\EntryPoint\FormAuthenticationEntryPoint" public="false">
               <argument type="service" id="http_kernel"/>
@@ -2171,7 +2234,7 @@
                   <argument type="service" id="router" on-invalid="null"/>
                 </service>
               </argument>
-              <argument>_demo_login</argument>
+              <argument>/login</argument>
               <argument>false</argument>
             </service>
           </argument>
@@ -2516,11 +2579,11 @@
     <service id="doctrine.dbal.default_connection" class="Doctrine\DBAL\Connection">
       <argument type="collection">
         <argument key="driver">pdo_mysql</argument>
-        <argument key="host">127.0.0.1</argument>
-        <argument key="port">null</argument>
-        <argument key="dbname">symfony</argument>
+        <argument key="host">localhost</argument>
+        <argument key="port">3306</argument>
+        <argument key="dbname">getresponse360</argument>
         <argument key="user">root</argument>
-        <argument key="password">null</argument>
+        <argument key="password">password</argument>
         <argument key="charset">UTF8</argument>
         <argument key="driverOptions" type="collection"/>
       </argument>
@@ -2603,7 +2666,9 @@
       <argument type="service">
         <service class="Doctrine\ORM\Configuration" public="false">
           <call method="setEntityNamespaces">
-            <argument type="collection"/>
+            <argument type="collection">
+              <argument key="Getresponse360UserBundle">Getresponse360\UserBundle\Entity</argument>
+            </argument>
           </call>
           <call method="setMetadataCacheImpl">
             <argument type="service" id="doctrine_cache.providers.doctrine.orm.default_metadata_cache"/>
@@ -2617,6 +2682,17 @@
           <call method="setMetadataDriverImpl">
             <argument type="service">
               <service class="Doctrine\Common\Persistence\Mapping\Driver\MappingDriverChain" public="false">
+                <call method="addDriver">
+                  <argument type="service">
+                    <service class="Doctrine\ORM\Mapping\Driver\AnnotationDriver" public="false">
+                      <argument type="service" id="annotation_reader"/>
+                      <argument type="collection">
+                        <argument>/Users/max/sites/getresponse/src/Getresponse360/UserBundle/Entity</argument>
+                      </argument>
+                    </service>
+                  </argument>
+                  <argument>Getresponse360\UserBundle\Entity</argument>
+                </call>
                 <call method="addDriver">
                   <argument type="service">
                     <service class="Doctrine\ORM\Mapping\Driver\XmlDriver">
@@ -2721,6 +2797,9 @@
       <argument type="service" id="security.user_checker"/>
       <argument type="service" id="security.authentication.session_strategy"/>
       <argument type="service" id="service_container"/>
+    </service>
+    <service id="fos_user.user_provider.username" class="FOS\UserBundle\Security\UserProvider" public="false">
+      <argument type="service" id="fos_user.user_manager"/>
     </service>
     <service id="fos_user.util.user_manipulator" class="FOS\UserBundle\Util\UserManipulator">
       <argument type="service" id="fos_user.user_manager"/>
@@ -3129,10 +3208,12 @@
     </service>
     <service id="security.encoder_factory" class="Symfony\Component\Security\Core\Encoder\EncoderFactory">
       <argument type="collection">
-        <argument key="Symfony\Component\Security\Core\User\User" type="collection">
-          <argument key="class">%security.encoder.plain.class%</argument>
+        <argument key="FOS\UserBundle\Model\UserInterface" type="collection">
+          <argument key="class">%security.encoder.digest.class%</argument>
           <argument key="arguments" type="collection">
-            <argument>false</argument>
+            <argument>sha512</argument>
+            <argument>true</argument>
+            <argument>5000</argument>
           </argument>
         </argument>
       </argument>
