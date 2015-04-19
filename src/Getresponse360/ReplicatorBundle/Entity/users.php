@@ -157,9 +157,9 @@ class users
     /**
      * @var \DateTime
      *
-     * @ORM\Column(name="dateJointed", type="datetime")
+     * @ORM\Column(name="dateJoined", type="datetime")
      */
-    private $dateJointed;
+    private $dateJoined;
 
     /**
      * @var \DateTime
@@ -680,26 +680,26 @@ class users
     }
 
     /**
-     * Set dateJointed
+     * Set dateJoined
      *
-     * @param \DateTime $dateJointed
+     * @param \DateTime $dateJoined
      * @return User
      */
-    public function setDateJointed($dateJointed)
+    public function setDateJoined($dateJoined)
     {
-        $this->dateJointed = $dateJointed;
+        $this->dateJoined = $dateJoined;
 
         return $this;
     }
 
     /**
-     * Get dateJointed
+     * Get dateJoined
      *
      * @return \DateTime 
      */
-    public function getDateJointed()
+    public function getDateJoined()
     {
-        return $this->dateJointed;
+        return $this->dateJoined;
     }
 
     /**

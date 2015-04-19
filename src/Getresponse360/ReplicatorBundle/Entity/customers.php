@@ -18,8 +18,6 @@ class customers
      * @ORM\Column(name="id", type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
-     * @ORM\OneToOne(targetEntity="customer_balance")
-     * @ORM\JoinColumn(name="id", referencedColumnName="id")
      */
     private $id;
 

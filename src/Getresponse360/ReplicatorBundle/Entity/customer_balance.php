@@ -16,6 +16,7 @@ class customer_balance
      * @var integer
      *
      * @ORM\Column(name="customerId", type="integer")
+     * @ORM\Id
      */
     private $customerId;
 
