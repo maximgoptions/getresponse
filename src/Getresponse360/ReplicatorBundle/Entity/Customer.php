@@ -5,12 +5,12 @@ namespace Getresponse360\ReplicatorBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * customers
+ * Customer
  *
- * @ORM\Table()
+ * @ORM\Table(name="customers", uniqueConstraints={@ORM\UniqueConstraint(name="email", columns={"email"})}, indexes={@ORM\Index(name="GET_NUMCUST_IDX", columns={"isLead", "isDemo", "regTime"}), @ORM\Index(name="risk", columns={"risk"}), @ORM\Index(name="campaignId", columns={"campaignId"}), @ORM\Index(name="IDX_EmpInCharge", columns={"employeeInChargeId"}), @ORM\Index(name="IDX_firstDepositDate", columns={"firstDepositDate"}), @ORM\Index(name="IDX_authKey", columns={"authKey"}), @ORM\Index(name="IDX_subCampaignId", columns={"subCampaignId"})})
  * @ORM\Entity
  */
-class customers
+class Customer
 {
     /**
      * @var integer
@@ -168,6 +168,190 @@ class customers
      */
     private $isSuspended;
 
+    /**
+     * @var boolean
+     *
+     * @ORM\OneToMany(targetEntity="Getresponse360\ReplicatorBundle\Entity\CustomerDeposit", mappedBy="customer")
+     */
+    private $deposits;
+
+    /**
+     * @var boolean
+     *
+     * @ORM\OneToMany(targetEntity="Getresponse360\ReplicatorBundle\Entity\Withdrawal", mappedBy="customer")
+     */
+    private $withdrawal;
+
+    /**
+     * @var boolean
+     *
+     * @ORM\OneToMany(targetEntity="Getresponse360\ReplicatorBundle\Entity\Positions", mappedBy="customer")
+     */
+    private $positions;
+
+    /**
+     * @var boolean
+     *
+     * @ORM\ManyToOne(targetEntity="Getresponse360\ReplicatorBundle\Entity\User", inversedBy="customer")
+     * @ORM\JoinColumn(name="employeeinchargeid", referencedColumnName="id")
+     */
+    private $user;
+
+    /**
+     * @var boolean
+     *
+     * @ORM\ManyToOne(targetEntity="Getresponse360\ReplicatorBundle\Entity\Country", inversedBy="customer")
+     * @ORM\JoinColumn(name="country", referencedColumnName="id")
+     */
+    private $mycountry;
+
+    /**
+     * Add deposits
+     *
+     * @param \Getresponse360\ReplicatorBundle\Entity\CustomerDeposit $deposits
+     * @return Customer
+     */
+    public function addDeposit(\Getresponse360\ReplicatorBundle\Entity\CustomerDeposit $deposits)
+    {
+        $this->deposits[] = $deposits;
+
+        return $this;
+    }
+
+    /**
+     * Remove deposits
+     *
+     * @param \Getresponse360\ReplicatorBundle\Entity\CustomerDeposit $deposits
+     */
+    public function removeDeposit(\Getresponse360\ReplicatorBundle\Entity\CustomerDeposit $deposits)
+    {
+        $this->deposits->removeElement($deposits);
+    }
+
+    /**
+     * Get deposits
+     *
+     * @return \Doctrine\Common\Collections\Collection 
+     */
+    public function getDeposits()
+    {
+        return $this->deposits;
+    }
+
+
+    /**
+     * Add withdrawal
+     *
+     * @param \Getresponse360\ReplicatorBundle\Entity\Withdrawal $withdrawal
+     * @return Customer
+     */
+    public function addWithdrawal(\Getresponse360\ReplicatorBundle\Entity\Withdrawal $withdrawal)
+    {
+        $this->withdrawal[] = $withdrawal;
+
+        return $this;
+    }
+
+    /**
+     * Remove withdrawal
+     *
+     * @param \Getresponse360\ReplicatorBundle\Entity\Withdrawal $withdrawal
+     */
+    public function removeWithdrawal(\Getresponse360\ReplicatorBundle\Entity\Withdrawal $withdrawal)
+    {
+        $this->withdrawal->removeElement($withdrawal);
+    }
+
+    /**
+     * Get withdrawal
+     *
+     * @return \Doctrine\Common\Collections\Collection 
+     */
+    public function getWithdrawal()
+    {
+        return $this->withdrawal;
+    }
+
+
+    /**
+     * Add positions
+     *
+     * @param \Getresponse360\ReplicatorBundle\Entity\Positions $positions
+     * @return Customer
+     */
+    public function addPositions(\Getresponse360\ReplicatorBundle\Entity\Positions $positions)
+    {
+        $this->positions[] = $positions;
+
+        return $this;
+    }
+
+    /**
+     * Remove positions
+     *
+     * @param \Getresponse360\ReplicatorBundle\Entity\Positions $positions
+     */
+    public function removePositions(\Getresponse360\ReplicatorBundle\Entity\Positions $positions)
+    {
+        $this->positions->removeElement($positions);
+    }
+
+    /**
+     * Get positions
+     *
+     * @return \Doctrine\Common\Collections\Collection 
+     */
+    public function getPositions()
+    {
+        return $this->positions;
+    }
+
+    /**
+     * Add positions
+     *
+     * @param \Getresponse360\ReplicatorBundle\Entity\Positions $positions
+     * @return Customer
+     */
+    public function addPosition(\Getresponse360\ReplicatorBundle\Entity\Positions $positions)
+    {
+        $this->positions[] = $positions;
+
+        return $this;
+    }
+
+    /**
+     * Remove positions
+     *
+     * @param \Getresponse360\ReplicatorBundle\Entity\Positions $positions
+     */
+    public function removePosition(\Getresponse360\ReplicatorBundle\Entity\Positions $positions)
+    {
+        $this->positions->removeElement($positions);
+    }
+
+
+    /**
+     * Set user
+     *
+     * @param \Getresponse360\ReplicatorBundle\Entity\User $user
+     * @return Customer
+     */
+    public function setUser(\Getresponse360\ReplicatorBundle\Entity\User $user = null)
+    {
+        $this->user = $user;
+
+        return $this;
+    }
+
+    /**
+     * Get user
+     *
+     * @return \Getresponse360\ReplicatorBundle\Entity\User 
+     */
+    public function getUser()
+    {
+        return $this->user;
+    }
 
     /**
      * Get id

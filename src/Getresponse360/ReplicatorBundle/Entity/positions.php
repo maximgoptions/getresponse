@@ -5,12 +5,12 @@ namespace Getresponse360\ReplicatorBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * positions
+ * Positions
  *
  * @ORM\Table()
  * @ORM\Entity
  */
-class positions
+class Positions
 {
     /**
      * @var integer
@@ -133,6 +133,13 @@ class positions
      */
     private $opmultiplier;
 
+    /**
+     * @var integer
+     *
+     * @ORM\ManyToOne(targetEntity="Getresponse360\ReplicatorBundle\Entity\Customer", inversedBy="positions")
+     * @ORM\JoinColumn(name="customerid", referencedColumnName="id")
+     */
+    private $customer;
 
     /**
      * Get id
@@ -510,5 +517,28 @@ class positions
     public function getOpmultiplier()
     {
         return $this->opmultiplier;
+    }
+
+    /**
+     * Set customer
+     *
+     * @param \Getresponse360\ReplicatorBundle\Entity\Customer $customer
+     * @return CustomerDeposit
+     */
+    public function setCustomer(\Getresponse360\ReplicatorBundle\Entity\Customer $customer = null)
+    {
+        $this->customer = $customer;
+
+        return $this;
+    }
+
+    /**
+     * Get customer
+     *
+     * @return \Getresponse360\ReplicatorBundle\Entity\Customer 
+     */
+    public function getCustomer()
+    {
+        return $this->customer;
     }
 }

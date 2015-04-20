@@ -5,19 +5,19 @@ namespace Getresponse360\ReplicatorBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * customer_deposits
+ * CustomerDeposit
  *
  * @ORM\Table()
  * @ORM\Entity
  */
-class customer_deposits
+class CustomerDeposit
 {
     /**
      * @var integer
      *
      * @ORM\Column(name="id", type="integer")
      * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
+     * @ORM\GeneratedValue(strategy="AUTO")\
      */
     private $id;
 
@@ -126,7 +126,27 @@ class customer_deposits
      */
     private $bonusActivationDate;
 
+    /**
+     * @var integer
+     *
+     * @ORM\ManyToOne(targetEntity="Getresponse360\ReplicatorBundle\Entity\Customer", inversedBy="deposits")
+     * @ORM\JoinColumn(name="customerid", referencedColumnName="id")
+     */
+    private $customer;
 
+
+    /**
+     * Set customer
+     *
+     * @param \Getresponse360\ReplicatorBundle\Entity\Customer $customer
+     * @return CustomerDeposit
+     */
+    public function setCustomer(\Getresponse360\ReplicatorBundle\Entity\customers $customer = null)
+    {
+        $this->customer = $customer;
+
+        return $this;
+    }
     /**
      * Get id
      *

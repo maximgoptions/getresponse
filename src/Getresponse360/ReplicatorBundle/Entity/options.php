@@ -18,6 +18,8 @@ class options
      * @ORM\Column(name="id", type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
+     * @ORM\ManyToOne(targetEntity="positions")
+     * @ORM\JoinColumn(name="id", referencedColumnName="optionId")
      */
     private $id;
 

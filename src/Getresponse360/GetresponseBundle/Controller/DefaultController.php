@@ -7,6 +7,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Getresponse360\GetresponseBundle\Services\JsonRPCClient;
 use Getresponse360\ReplicatorBundle\Entity;
+use Getresponse360\ReplicatorBundle\Services;
 
 class DefaultController extends Controller
 {
@@ -21,19 +22,26 @@ class DefaultController extends Controller
     	 //print_r($results);
     	 //exit();
 
-		$lastIdImported = 0;
+		$lastIdImported = 2;
+		$depositID = 10;
     	$emReplicator = $this->getDoctrine()->getManager('goptions_platform');
     	$query = $emReplicator->createQuery(
-				'SELECT d FROM Getresponse360ReplicatorBundle:customers d
-				WHERE d.id  >= :lastIdImported
-				ORDER BY d.id ASC'
+				'SELECT c.id FROM Getresponse360ReplicatorBundle:Customer c
+				LEFT JOIN c.deposits d
+				WHERE c.id  = :lastIdImported
+				AND d.id < :depositID'
 			) 
 			->setParameter('lastIdImported', $lastIdImported)
-			->setMaxResults(500);
+			->setParameter('depositID', $depositID)
+			->setMaxResults(100);
+		//ORDER BY d.id ASC
 
-		var_dump($query->getResult());
+		//echo "<pre>";	
+		//var_dump($query->getResult());
+		//echo "</pre>";	
+		dump($query->getResult());
 		exit();
-		$results = "Results:";
+		$results = $query->getResult();
 
         return array('name' => $results);
     }

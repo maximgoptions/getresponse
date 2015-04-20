@@ -5,12 +5,12 @@ namespace Getresponse360\ReplicatorBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * withdrawals
+ * Withdrawal
  *
  * @ORM\Table()
  * @ORM\Entity
  */
-class withdrawals
+class Withdrawal
 {
     /**
      * @var integer

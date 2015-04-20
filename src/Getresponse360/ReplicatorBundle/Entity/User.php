@@ -5,12 +5,12 @@ namespace Getresponse360\ReplicatorBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * users
+ * User
  *
  * @ORM\Table()
  * @ORM\Entity
  */
-class users
+class User
 {
     /**
      * @var integer
@@ -230,6 +230,13 @@ class users
      * @ORM\Column(name="signature", type="string", length=500)
      */
     private $signature;
+
+    /**
+     * @var boolean
+     *
+     * @ORM\OneToMany(targetEntity="Getresponse360\ReplicatorBundle\Entity\Customer", mappedBy="user")
+     */
+    private $customer;
 
 
     /**
@@ -930,5 +937,38 @@ class users
     public function getSignature()
     {
         return $this->signature;
+    }
+
+    /**
+     * Add customer
+     *
+     * @param \Getresponse360\ReplicatorBundle\Entity\Customer $customer
+     * @return User
+     */
+    public function addCustomer(\Getresponse360\ReplicatorBundle\Entity\Customer $customer)
+    {
+        $this->customer[] = $customer;
+
+        return $this;
+    }
+
+    /**
+     * Remove customer
+     *
+     * @param \Getresponse360\ReplicatorBundle\Entity\Customer $customer
+     */
+    public function removeCustomer(\Getresponse360\ReplicatorBundle\Entity\Customer $customer)
+    {
+        $this->customer->removeElement($customer);
+    }
+
+    /**
+     * Get customer
+     *
+     * @return \Doctrine\Common\Collections\Collection 
+     */
+    public function getCustomer()
+    {
+        return $this->customer;
     }
 }
