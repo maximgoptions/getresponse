@@ -7,7 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * Positions
  *
- * @ORM\Table()
+ * @ORM\Table(name="positions")
  * @ORM\Entity
  */
 class Positions

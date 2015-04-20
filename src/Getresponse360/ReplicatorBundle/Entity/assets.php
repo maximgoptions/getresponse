@@ -71,63 +71,6 @@ class Assets
     private $options;
 
     /**
-     * Add options
-     *
-     * @param \Getresponse360\ReplicatorBundle\Entity\Options $options
-     * @return Customer
-     */
-    public function addOptions(\Getresponse360\ReplicatorBundle\Entity\Options $options)
-    {
-        $this->options[] = $options;
-
-        return $this;
-    }
-
-    /**
-     * Remove options
-     *
-     * @param \Getresponse360\ReplicatorBundle\Entity\Options $options
-     */
-    public function removePositions(\Getresponse360\ReplicatorBundle\Entity\Options $options)
-    {
-        $this->options->removeElement($options);
-    }
-
-    /**
-     * Get options
-     *
-     * @return \Doctrine\Common\Collections\Collection 
-     */
-    public function getPositions()
-    {
-        return $this->options;
-    }
-
-    /**
-     * Add options
-     *
-     * @param \Getresponse360\ReplicatorBundle\Entity\Options $options
-     * @return Customer
-     */
-    public function addPosition(\Getresponse360\ReplicatorBundle\Entity\Options $options)
-    {
-        $this->options[] = $options;
-
-        return $this;
-    }
-
-    /**
-     * Remove options
-     *
-     * @param \Getresponse360\ReplicatorBundle\Entity\Options $options
-     */
-    public function removePosition(\Getresponse360\ReplicatorBundle\Entity\Options $options)
-    {
-        $this->options->removeElement($options);
-    }
-
-
-    /**
      * Get id
      *
      * @return integer 
@@ -273,5 +216,38 @@ class Assets
     public function getTradePrice()
     {
         return $this->tradePrice;
+    }
+
+    /**
+     * Add options
+     *
+     * @param \Getresponse360\ReplicatorBundle\Entity\Options $options
+     * @return Customer
+     */
+    public function addOptions(\Getresponse360\ReplicatorBundle\Entity\Options $options)
+    {
+        $this->options[] = $options;
+
+        return $this;
+    }
+
+    /**
+     * Remove options
+     *
+     * @param \Getresponse360\ReplicatorBundle\Entity\Options $options
+     */
+    public function removeOptions(\Getresponse360\ReplicatorBundle\Entity\Options $options)
+    {
+        $this->options->removeElement($options);
+    }
+
+    /**
+     * Get options
+     *
+     * @return \Doctrine\Common\Collections\Collection 
+     */
+    public function getOptions()
+    {
+        return $this->options;
     }
 }

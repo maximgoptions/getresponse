@@ -249,62 +249,6 @@ class Options
     private $assets;
 
     /**
-     * Add positions
-     *
-     * @param \Getresponse360\ReplicatorBundle\Entity\Positions $positions
-     * @return Customer
-     */
-    public function addPositions(\Getresponse360\ReplicatorBundle\Entity\Positions $positions)
-    {
-        $this->positions[] = $positions;
-
-        return $this;
-    }
-
-    /**
-     * Remove positions
-     *
-     * @param \Getresponse360\ReplicatorBundle\Entity\Positions $positions
-     */
-    public function removePositions(\Getresponse360\ReplicatorBundle\Entity\Positions $positions)
-    {
-        $this->positions->removeElement($positions);
-    }
-
-    /**
-     * Get positions
-     *
-     * @return \Doctrine\Common\Collections\Collection 
-     */
-    public function getPositions()
-    {
-        return $this->positions;
-    }
-
-    /**
-     * Add positions
-     *
-     * @param \Getresponse360\ReplicatorBundle\Entity\Positions $positions
-     * @return Customer
-     */
-    public function addPosition(\Getresponse360\ReplicatorBundle\Entity\Positions $positions)
-    {
-        $this->positions[] = $positions;
-
-        return $this;
-    }
-
-    /**
-     * Remove positions
-     *
-     * @param \Getresponse360\ReplicatorBundle\Entity\Positions $positions
-     */
-    public function removePosition(\Getresponse360\ReplicatorBundle\Entity\Positions $positions)
-    {
-        $this->positions->removeElement($positions);
-    }
-
-    /**
      * Get id
      *
      * @return integer 
@@ -1002,5 +946,38 @@ class Options
     public function getLastUpdateDate()
     {
         return $this->lastUpdateDate;
+    }
+
+    /**
+     * Add positions
+     *
+     * @param \Getresponse360\ReplicatorBundle\Entity\Positions $positions
+     * @return Position
+     */
+    public function addPositions(\Getresponse360\ReplicatorBundle\Entity\Positions $positions)
+    {
+        $this->positions[] = $positions;
+
+        return $this;
+    }
+
+    /**
+     * Get positions
+     *
+     * @return \Doctrine\Common\Collections\Collection 
+     */
+    public function getPositions()
+    {
+        return $this->positions;
+    }
+
+    /**
+     * Remove positions
+     *
+     * @param \Getresponse360\ReplicatorBundle\Entity\Options $options
+     */
+    public function removePositions(\Getresponse360\ReplicatorBundle\Entity\Positions $positions)
+    {
+        $this->positions->removeElement($positions);
     }
 }

@@ -77,20 +77,6 @@ class Country
      */
     private $customer;
 
-
-    /**
-     * Set customer
-     *
-     * @param \Getresponse360\ReplicatorBundle\Entity\Customer $customer
-     * @return CustomerDeposit
-     */
-    public function setCustomer(\Getresponse360\ReplicatorBundle\Entity\customers $customer = null)
-    {
-        $this->customer = $customer;
-
-        return $this;
-    }
-
     /**
      * Get id
      *
@@ -260,5 +246,18 @@ class Country
     public function getAllowRegistration()
     {
         return $this->allowRegistration;
+    }
+
+    /**
+     * Set customer
+     *
+     * @param \Getresponse360\ReplicatorBundle\Entity\Customer $customer
+     * @return CustomerDeposit
+     */
+    public function setCustomer(\Getresponse360\ReplicatorBundle\Entity\customers $customer = null)
+    {
+        $this->customer = $customer;
+
+        return $this;
     }
 }

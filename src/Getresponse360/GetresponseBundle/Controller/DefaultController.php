@@ -22,13 +22,15 @@ class DefaultController extends Controller
     	 //print_r($results);
     	 //exit();
 
-		$lastIdImported = 2;
+		$lastIdImported = 1742;
 		$depositID = 10;
     	$emReplicator = $this->getDoctrine()->getManager('goptions_platform');
     	$query = $emReplicator->createQuery(
-				'SELECT c.id as customerId, d.lastBalance as balance FROM Getresponse360ReplicatorBundle:Customer c
-				LEFT JOIN c.customerbalance d
-				WHERE c.id  = :lastIdImported'
+				'SELECT o.id as optionId, p.id as positionId, a.id
+				FROM Getresponse360ReplicatorBundle:Positions o
+				LEFT JOIN o.option p
+				LEFT JOIN p.assets a
+				WHERE o.id  = :lastIdImported'
 			) 
 			->setParameter('lastIdImported', $lastIdImported)
 			//->setParameter('depositID', $depositID)

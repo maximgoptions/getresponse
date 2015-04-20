@@ -213,178 +213,6 @@ class Customer
      */
     private $customerbalance;
 
-
-    /**
-     * Add deposits
-     *
-     * @param \Getresponse360\ReplicatorBundle\Entity\CustomerDeposit $deposits
-     * @return Customer
-     */
-    public function addDeposit(\Getresponse360\ReplicatorBundle\Entity\CustomerDeposit $deposits)
-    {
-        $this->deposits[] = $deposits;
-
-        return $this;
-    }
-
-    /**
-     * Remove deposits
-     *
-     * @param \Getresponse360\ReplicatorBundle\Entity\CustomerDeposit $deposits
-     */
-    public function removeDeposit(\Getresponse360\ReplicatorBundle\Entity\CustomerDeposit $deposits)
-    {
-        $this->deposits->removeElement($deposits);
-    }
-
-    /**
-     * Get deposits
-     *
-     * @return \Doctrine\Common\Collections\Collection 
-     */
-    public function getDeposits()
-    {
-        return $this->deposits;
-    }
-
-
-    /**
-     * Add withdrawal
-     *
-     * @param \Getresponse360\ReplicatorBundle\Entity\Withdrawal $withdrawal
-     * @return Customer
-     */
-    public function addWithdrawal(\Getresponse360\ReplicatorBundle\Entity\Withdrawal $withdrawal)
-    {
-        $this->withdrawal[] = $withdrawal;
-
-        return $this;
-    }
-
-    /**
-     * Remove withdrawal
-     *
-     * @param \Getresponse360\ReplicatorBundle\Entity\Withdrawal $withdrawal
-     */
-    public function removeWithdrawal(\Getresponse360\ReplicatorBundle\Entity\Withdrawal $withdrawal)
-    {
-        $this->withdrawal->removeElement($withdrawal);
-    }
-
-    /**
-     * Get withdrawal
-     *
-     * @return \Doctrine\Common\Collections\Collection 
-     */
-    public function getWithdrawal()
-    {
-        return $this->withdrawal;
-    }
-
-
-    /**
-     * Add positions
-     *
-     * @param \Getresponse360\ReplicatorBundle\Entity\Positions $positions
-     * @return Customer
-     */
-    public function addPositions(\Getresponse360\ReplicatorBundle\Entity\Positions $positions)
-    {
-        $this->positions[] = $positions;
-
-        return $this;
-    }
-
-    /**
-     * Remove positions
-     *
-     * @param \Getresponse360\ReplicatorBundle\Entity\Positions $positions
-     */
-    public function removePositions(\Getresponse360\ReplicatorBundle\Entity\Positions $positions)
-    {
-        $this->positions->removeElement($positions);
-    }
-
-    /**
-     * Get positions
-     *
-     * @return \Doctrine\Common\Collections\Collection 
-     */
-    public function getPositions()
-    {
-        return $this->positions;
-    }
-
-    /**
-     * Add positions
-     *
-     * @param \Getresponse360\ReplicatorBundle\Entity\Positions $positions
-     * @return Customer
-     */
-    public function addPosition(\Getresponse360\ReplicatorBundle\Entity\Positions $positions)
-    {
-        $this->positions[] = $positions;
-
-        return $this;
-    }
-
-    /**
-     * Remove positions
-     *
-     * @param \Getresponse360\ReplicatorBundle\Entity\Positions $positions
-     */
-    public function removePosition(\Getresponse360\ReplicatorBundle\Entity\Positions $positions)
-    {
-        $this->positions->removeElement($positions);
-    }
-
-
-    /**
-     * Set user
-     *
-     * @param \Getresponse360\ReplicatorBundle\Entity\User $user
-     * @return Customer
-     */
-    public function setUser(\Getresponse360\ReplicatorBundle\Entity\User $user = null)
-    {
-        $this->user = $user;
-
-        return $this;
-    }
-
-    /**
-     * Get user
-     *
-     * @return \Getresponse360\ReplicatorBundle\Entity\User 
-     */
-    public function getUser()
-    {
-        return $this->user;
-    }
-
-    /**
-     * Set customerbalance
-     *
-     * @param \Getresponse360\ReplicatorBundle\Entity\CustomerBalance $customerbalance
-     * @return Customer
-     */
-    public function setcustomerbalance(\Getresponse360\ReplicatorBundle\Entity\CustomerBalance $customerbalance = null)
-    {
-        $this->customerbalance = $customerbalance;
-
-        return $this;
-    }
-
-    /**
-     * Get customerbalance
-     *
-     * @return \Getresponse360\ReplicatorBundle\Entity\CustomerBalance 
-     */
-    public function getcustomerbalance()
-    {
-        return $this->customerbalance;
-    }
-
     /**
      * Get id
      *
@@ -876,5 +704,176 @@ class Customer
     public function getIsSuspended()
     {
         return $this->isSuspended;
+    }
+
+    /**
+     * Add deposits
+     *
+     * @param \Getresponse360\ReplicatorBundle\Entity\CustomerDeposit $deposits
+     * @return Customer
+     */
+    public function addDeposit(\Getresponse360\ReplicatorBundle\Entity\CustomerDeposit $deposits)
+    {
+        $this->deposits[] = $deposits;
+
+        return $this;
+    }
+
+    /**
+     * Remove deposits
+     *
+     * @param \Getresponse360\ReplicatorBundle\Entity\CustomerDeposit $deposits
+     */
+    public function removeDeposit(\Getresponse360\ReplicatorBundle\Entity\CustomerDeposit $deposits)
+    {
+        $this->deposits->removeElement($deposits);
+    }
+
+    /**
+     * Get deposits
+     *
+     * @return \Doctrine\Common\Collections\Collection 
+     */
+    public function getDeposits()
+    {
+        return $this->deposits;
+    }
+
+
+    /**
+     * Add withdrawal
+     *
+     * @param \Getresponse360\ReplicatorBundle\Entity\Withdrawal $withdrawal
+     * @return Customer
+     */
+    public function addWithdrawal(\Getresponse360\ReplicatorBundle\Entity\Withdrawal $withdrawal)
+    {
+        $this->withdrawal[] = $withdrawal;
+
+        return $this;
+    }
+
+    /**
+     * Remove withdrawal
+     *
+     * @param \Getresponse360\ReplicatorBundle\Entity\Withdrawal $withdrawal
+     */
+    public function removeWithdrawal(\Getresponse360\ReplicatorBundle\Entity\Withdrawal $withdrawal)
+    {
+        $this->withdrawal->removeElement($withdrawal);
+    }
+
+    /**
+     * Get withdrawal
+     *
+     * @return \Doctrine\Common\Collections\Collection 
+     */
+    public function getWithdrawal()
+    {
+        return $this->withdrawal;
+    }
+
+
+    /**
+     * Add positions
+     *
+     * @param \Getresponse360\ReplicatorBundle\Entity\Positions $positions
+     * @return Customer
+     */
+    public function addPositions(\Getresponse360\ReplicatorBundle\Entity\Positions $positions)
+    {
+        $this->positions[] = $positions;
+
+        return $this;
+    }
+
+    /**
+     * Remove positions
+     *
+     * @param \Getresponse360\ReplicatorBundle\Entity\Positions $positions
+     */
+    public function removePositions(\Getresponse360\ReplicatorBundle\Entity\Positions $positions)
+    {
+        $this->positions->removeElement($positions);
+    }
+
+    /**
+     * Get positions
+     *
+     * @return \Doctrine\Common\Collections\Collection 
+     */
+    public function getPositions()
+    {
+        return $this->positions;
+    }
+
+    /**
+     * Add positions
+     *
+     * @param \Getresponse360\ReplicatorBundle\Entity\Positions $positions
+     * @return Customer
+     */
+    public function addPosition(\Getresponse360\ReplicatorBundle\Entity\Positions $positions)
+    {
+        $this->positions[] = $positions;
+
+        return $this;
+    }
+
+    /**
+     * Remove positions
+     *
+     * @param \Getresponse360\ReplicatorBundle\Entity\Positions $positions
+     */
+    public function removePosition(\Getresponse360\ReplicatorBundle\Entity\Positions $positions)
+    {
+        $this->positions->removeElement($positions);
+    }
+
+
+    /**
+     * Set user
+     *
+     * @param \Getresponse360\ReplicatorBundle\Entity\User $user
+     * @return Customer
+     */
+    public function setUser(\Getresponse360\ReplicatorBundle\Entity\User $user = null)
+    {
+        $this->user = $user;
+
+        return $this;
+    }
+
+    /**
+     * Get user
+     *
+     * @return \Getresponse360\ReplicatorBundle\Entity\User 
+     */
+    public function getUser()
+    {
+        return $this->user;
+    }
+
+    /**
+     * Set customerbalance
+     *
+     * @param \Getresponse360\ReplicatorBundle\Entity\CustomerBalance $customerbalance
+     * @return Customer
+     */
+    public function setcustomerbalance(\Getresponse360\ReplicatorBundle\Entity\CustomerBalance $customerbalance = null)
+    {
+        $this->customerbalance = $customerbalance;
+
+        return $this;
+    }
+
+    /**
+     * Get customerbalance
+     *
+     * @return \Getresponse360\ReplicatorBundle\Entity\CustomerBalance 
+     */
+    public function getcustomerbalance()
+    {
+        return $this->customerbalance;
     }
 }
