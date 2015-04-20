@@ -7,7 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * Withdrawal
  *
- * @ORM\Table()
+ * @ORM\Table(name="withdrawals")
  * @ORM\Entity
  */
 class Withdrawal
@@ -153,6 +153,28 @@ class Withdrawal
      * @ORM\Column(name="lastUpdateDate", type="datetime")
      */
     private $lastUpdateDate;
+
+    /**
+     * @var integer
+     *
+     * @ORM\ManyToOne(targetEntity="Getresponse360\ReplicatorBundle\Entity\Customer", inversedBy="deposits")
+     * @ORM\JoinColumn(name="customerid", referencedColumnName="id")
+     */
+    private $customer;
+
+
+    /**
+     * Set customer
+     *
+     * @param \Getresponse360\ReplicatorBundle\Entity\Customer $customer
+     * @return CustomerDeposit
+     */
+    public function setCustomer(\Getresponse360\ReplicatorBundle\Entity\customers $customer = null)
+    {
+        $this->customer = $customer;
+
+        return $this;
+    }
 
 
     /**

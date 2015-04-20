@@ -5,12 +5,12 @@ namespace Getresponse360\ReplicatorBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * options
+ * Options
  *
- * @ORM\Table()
+ * @ORM\Table(name="options")
  * @ORM\Entity
  */
-class options
+class Options
 {
     /**
      * @var integer
@@ -233,6 +233,76 @@ class options
      */
     private $lastUpdateDate;
 
+    /**
+     * @var boolean
+     *
+     * @ORM\OneToMany(targetEntity="Getresponse360\ReplicatorBundle\Entity\Positions", mappedBy="option")
+     */
+    private $positions;
+
+    /**
+     * @var integer
+     *
+     * @ORM\ManyToOne(targetEntity="Getresponse360\ReplicatorBundle\Entity\Options", inversedBy="options")
+     * @ORM\JoinColumn(name="assetId", referencedColumnName="id")
+     */
+    private $assets;
+
+    /**
+     * Add positions
+     *
+     * @param \Getresponse360\ReplicatorBundle\Entity\Positions $positions
+     * @return Customer
+     */
+    public function addPositions(\Getresponse360\ReplicatorBundle\Entity\Positions $positions)
+    {
+        $this->positions[] = $positions;
+
+        return $this;
+    }
+
+    /**
+     * Remove positions
+     *
+     * @param \Getresponse360\ReplicatorBundle\Entity\Positions $positions
+     */
+    public function removePositions(\Getresponse360\ReplicatorBundle\Entity\Positions $positions)
+    {
+        $this->positions->removeElement($positions);
+    }
+
+    /**
+     * Get positions
+     *
+     * @return \Doctrine\Common\Collections\Collection 
+     */
+    public function getPositions()
+    {
+        return $this->positions;
+    }
+
+    /**
+     * Add positions
+     *
+     * @param \Getresponse360\ReplicatorBundle\Entity\Positions $positions
+     * @return Customer
+     */
+    public function addPosition(\Getresponse360\ReplicatorBundle\Entity\Positions $positions)
+    {
+        $this->positions[] = $positions;
+
+        return $this;
+    }
+
+    /**
+     * Remove positions
+     *
+     * @param \Getresponse360\ReplicatorBundle\Entity\Positions $positions
+     */
+    public function removePosition(\Getresponse360\ReplicatorBundle\Entity\Positions $positions)
+    {
+        $this->positions->removeElement($positions);
+    }
 
     /**
      * Get id

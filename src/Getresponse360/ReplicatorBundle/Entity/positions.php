@@ -142,6 +142,14 @@ class Positions
     private $customer;
 
     /**
+     * @var integer
+     *
+     * @ORM\ManyToOne(targetEntity="Getresponse360\ReplicatorBundle\Entity\Options", inversedBy="positions")
+     * @ORM\JoinColumn(name="optionId", referencedColumnName="id")
+     */
+    private $option;
+
+    /**
      * Get id
      *
      * @return integer 

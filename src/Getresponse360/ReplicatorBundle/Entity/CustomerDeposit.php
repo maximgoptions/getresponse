@@ -7,7 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * CustomerDeposit
  *
- * @ORM\Table()
+ * @ORM\Table(name="customer_deposits")
  * @ORM\Entity
  */
 class CustomerDeposit
@@ -147,6 +147,7 @@ class CustomerDeposit
 
         return $this;
     }
+
     /**
      * Get id
      *

@@ -70,6 +70,26 @@ class Country
      */
     private $allowRegistration;
 
+    /**
+     * @var integer
+     *
+     * @ORM\OneToMany(targetEntity="Getresponse360\ReplicatorBundle\Entity\Customer", mappedBy="user")
+     */
+    private $customer;
+
+
+    /**
+     * Set customer
+     *
+     * @param \Getresponse360\ReplicatorBundle\Entity\Customer $customer
+     * @return CustomerDeposit
+     */
+    public function setCustomer(\Getresponse360\ReplicatorBundle\Entity\customers $customer = null)
+    {
+        $this->customer = $customer;
+
+        return $this;
+    }
 
     /**
      * Get id

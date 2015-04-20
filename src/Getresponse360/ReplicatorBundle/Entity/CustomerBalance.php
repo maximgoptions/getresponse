@@ -5,12 +5,12 @@ namespace Getresponse360\ReplicatorBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * customer_balance
+ * CustomerBalance
  *
- * @ORM\Table()
+ * @ORM\Table(name="customer_balance")
  * @ORM\Entity
  */
-class customer_balance
+class CustomerBalance
 {
     /**
      * @var integer
@@ -54,6 +54,13 @@ class customer_balance
      * @ORM\Column(name="lastUpdate", type="datetime")
      */
     private $lastUpdate;
+
+    /**
+     * @var boolean
+     *
+     * @ORM\OneToMany(targetEntity="Getresponse360\ReplicatorBundle\Entity\Customer", mappedBy="user")
+     */
+    private $customer;
 
 
     /**
@@ -189,5 +196,38 @@ class customer_balance
     public function getLastUpdate()
     {
         return $this->lastUpdate;
+    }
+
+    /**
+     * Add customer
+     *
+     * @param \Getresponse360\ReplicatorBundle\Entity\Customer $customer
+     * @return User
+     */
+    public function addCustomer(\Getresponse360\ReplicatorBundle\Entity\Customer $customer)
+    {
+        $this->customer[] = $customer;
+
+        return $this;
+    }
+
+    /**
+     * Remove customer
+     *
+     * @param \Getresponse360\ReplicatorBundle\Entity\Customer $customer
+     */
+    public function removeCustomer(\Getresponse360\ReplicatorBundle\Entity\Customer $customer)
+    {
+        $this->customer->removeElement($customer);
+    }
+
+    /**
+     * Get customer
+     *
+     * @return \Doctrine\Common\Collections\Collection 
+     */
+    public function getCustomer()
+    {
+        return $this->customer;
     }
 }

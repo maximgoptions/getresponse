@@ -7,7 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * Customer
  *
- * @ORM\Table(name="customers", uniqueConstraints={@ORM\UniqueConstraint(name="email", columns={"email"})}, indexes={@ORM\Index(name="GET_NUMCUST_IDX", columns={"isLead", "isDemo", "regTime"}), @ORM\Index(name="risk", columns={"risk"}), @ORM\Index(name="campaignId", columns={"campaignId"}), @ORM\Index(name="IDX_EmpInCharge", columns={"employeeInChargeId"}), @ORM\Index(name="IDX_firstDepositDate", columns={"firstDepositDate"}), @ORM\Index(name="IDX_authKey", columns={"authKey"}), @ORM\Index(name="IDX_subCampaignId", columns={"subCampaignId"})})
+ * @ORM\Table(name="customers")
  * @ORM\Entity
  */
 class Customer
@@ -206,6 +206,15 @@ class Customer
     private $mycountry;
 
     /**
+     * @var boolean
+     *
+     * @ORM\ManyToOne(targetEntity="Getresponse360\ReplicatorBundle\Entity\CustomerBalance", inversedBy="customer")
+     * @ORM\JoinColumn(name="id", referencedColumnName="customerId")
+     */
+    private $customerbalance;
+
+
+    /**
      * Add deposits
      *
      * @param \Getresponse360\ReplicatorBundle\Entity\CustomerDeposit $deposits
@@ -351,6 +360,29 @@ class Customer
     public function getUser()
     {
         return $this->user;
+    }
+
+    /**
+     * Set customerbalance
+     *
+     * @param \Getresponse360\ReplicatorBundle\Entity\CustomerBalance $customerbalance
+     * @return Customer
+     */
+    public function setcustomerbalance(\Getresponse360\ReplicatorBundle\Entity\CustomerBalance $customerbalance = null)
+    {
+        $this->customerbalance = $customerbalance;
+
+        return $this;
+    }
+
+    /**
+     * Get customerbalance
+     *
+     * @return \Getresponse360\ReplicatorBundle\Entity\CustomerBalance 
+     */
+    public function getcustomerbalance()
+    {
+        return $this->customerbalance;
     }
 
     /**

@@ -26,13 +26,12 @@ class DefaultController extends Controller
 		$depositID = 10;
     	$emReplicator = $this->getDoctrine()->getManager('goptions_platform');
     	$query = $emReplicator->createQuery(
-				'SELECT c.id FROM Getresponse360ReplicatorBundle:Customer c
-				LEFT JOIN c.deposits d
-				WHERE c.id  = :lastIdImported
-				AND d.id < :depositID'
+				'SELECT c.id as customerId, d.lastBalance as balance FROM Getresponse360ReplicatorBundle:Customer c
+				LEFT JOIN c.customerbalance d
+				WHERE c.id  = :lastIdImported'
 			) 
 			->setParameter('lastIdImported', $lastIdImported)
-			->setParameter('depositID', $depositID)
+			//->setParameter('depositID', $depositID)
 			->setMaxResults(100);
 		//ORDER BY d.id ASC
 

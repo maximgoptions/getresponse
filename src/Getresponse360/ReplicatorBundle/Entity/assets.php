@@ -5,12 +5,12 @@ namespace Getresponse360\ReplicatorBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * assets
+ * Assets
  *
- * @ORM\Table()
+ * @ORM\Table(name="assets")
  * @ORM\Entity
  */
-class assets
+class Assets
 {
     /**
      * @var integer
@@ -18,8 +18,6 @@ class assets
      * @ORM\Column(name="id", type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
-     * @ORM\ManyToOne(targetEntity="options")
-     * @ORM\JoinColumn(name="id", referencedColumnName="assetId")
      */
     private $id;
 
@@ -64,6 +62,69 @@ class assets
      * @ORM\Column(name="tradePrice", type="decimal")
      */
     private $tradePrice;
+
+    /**
+     * @var boolean
+     *
+     * @ORM\OneToMany(targetEntity="Getresponse360\ReplicatorBundle\Entity\Options", mappedBy="assets")
+     */
+    private $options;
+
+    /**
+     * Add options
+     *
+     * @param \Getresponse360\ReplicatorBundle\Entity\Options $options
+     * @return Customer
+     */
+    public function addOptions(\Getresponse360\ReplicatorBundle\Entity\Options $options)
+    {
+        $this->options[] = $options;
+
+        return $this;
+    }
+
+    /**
+     * Remove options
+     *
+     * @param \Getresponse360\ReplicatorBundle\Entity\Options $options
+     */
+    public function removePositions(\Getresponse360\ReplicatorBundle\Entity\Options $options)
+    {
+        $this->options->removeElement($options);
+    }
+
+    /**
+     * Get options
+     *
+     * @return \Doctrine\Common\Collections\Collection 
+     */
+    public function getPositions()
+    {
+        return $this->options;
+    }
+
+    /**
+     * Add options
+     *
+     * @param \Getresponse360\ReplicatorBundle\Entity\Options $options
+     * @return Customer
+     */
+    public function addPosition(\Getresponse360\ReplicatorBundle\Entity\Options $options)
+    {
+        $this->options[] = $options;
+
+        return $this;
+    }
+
+    /**
+     * Remove options
+     *
+     * @param \Getresponse360\ReplicatorBundle\Entity\Options $options
+     */
+    public function removePosition(\Getresponse360\ReplicatorBundle\Entity\Options $options)
+    {
+        $this->options->removeElement($options);
+    }
 
 
     /**
