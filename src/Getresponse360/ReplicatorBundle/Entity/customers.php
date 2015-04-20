@@ -66,13 +66,6 @@ class customers
     /**
      * @var \DateTime
      *
-     * @ORM\Column(name="birthday", type="datetime")
-     */
-    private $birthday;
-
-    /**
-     * @var \DateTime
-     *
      * @ORM\Column(name="regTime", type="datetime")
      */
     private $regTime;
@@ -322,29 +315,6 @@ class customers
     public function getSiteLanguage()
     {
         return $this->siteLanguage;
-    }
-
-    /**
-     * Set birthday
-     *
-     * @param \DateTime $birthday
-     * @return Post
-     */
-    public function setBirthday($birthday)
-    {
-        $this->birthday = $birthday;
-
-        return $this;
-    }
-
-    /**
-     * Get birthday
-     *
-     * @return \DateTime 
-     */
-    public function getBirthday()
-    {
-        return $this->birthday;
     }
 
     /**

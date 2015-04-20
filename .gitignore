@@ -10,3 +10,5 @@ app/config/parameters.yml
 /bin/
 /composer.phar
 app/config/parameters.yml
+
+app/logs/dev.log
