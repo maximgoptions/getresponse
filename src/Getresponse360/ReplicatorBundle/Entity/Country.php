@@ -15,7 +15,7 @@ class Country
     /**
      * @var integer
      *
-     * @ORM\Column(name="id", type="integer")
+     * @ORM\Column(name="id",  type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
      */
@@ -252,9 +252,9 @@ class Country
      * Set customer
      *
      * @param \Getresponse360\ReplicatorBundle\Entity\Customer $customer
-     * @return CustomerDeposit
+     * @return Customer
      */
-    public function setCustomer(\Getresponse360\ReplicatorBundle\Entity\customers $customer = null)
+    public function setCustomer(\Getresponse360\ReplicatorBundle\Entity\Customer $customer = null)
     {
         $this->customer = $customer;
 

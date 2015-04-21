@@ -141,7 +141,7 @@ class CustomerDeposit
      * @param \Getresponse360\ReplicatorBundle\Entity\Customer $customer
      * @return CustomerDeposit
      */
-    public function setCustomer(\Getresponse360\ReplicatorBundle\Entity\customers $customer = null)
+    public function setCustomer(\Getresponse360\ReplicatorBundle\Entity\Customer $customer = null)
     {
         $this->customer = $customer;
 

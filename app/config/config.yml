@@ -76,6 +76,7 @@ doctrine:
                 mappings:
                     Getresponse360ApiBundle:      ~
                     Getresponse360UserBundle:     ~
+                    Getresponse360GetresponseBundle:      ~
             goptions_platform:
                 connection: goptions_platform
                 mappings:

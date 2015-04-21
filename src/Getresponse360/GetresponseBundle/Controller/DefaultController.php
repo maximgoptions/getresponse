@@ -8,6 +8,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Getresponse360\GetresponseBundle\Services\JsonRPCClient;
 use Getresponse360\ReplicatorBundle\Entity;
 use Getresponse360\ReplicatorBundle\Services;
+//use Getresponse360\GetresponseBundle\Entity as E2N;
 
 class DefaultController extends Controller
 {
@@ -18,29 +19,31 @@ class DefaultController extends Controller
     public function indexAction()
     {
     	 //em = $this->getDoctrine()->getManager();
-    	 //$results = $this->getDoctrine()->getRepository('Getresponse360UserBundle:user')->findById('2');
-    	 //print_r($results);
-    	 //exit();
+    	$results = $this->getDoctrine()->getManager()->getRepository('Getresponse360\GetresponseBundle\Entity\Settings')->findOneBy(array('id' => '0')); //getAny()->getOneOrNullResult();
 
-		$lastIdImported = 1742;
-		$depositID = 10;
+		$lastIdImported = ($results->getCurrent() % 500); //Current count of imported
+		//echo $lastIdImported;
+		$Count = $results->getSize();
     	$emReplicator = $this->getDoctrine()->getManager('goptions_platform');
     	$query = $emReplicator->createQuery(
 				'SELECT o.id as optionId, p.id as positionId, a.id
 				FROM Getresponse360ReplicatorBundle:Positions o
 				LEFT JOIN o.option p
 				LEFT JOIN p.assets a
-				WHERE o.id  = :lastIdImported'
+				WHERE o.id  >= :lastIdImported'
 			) 
 			->setParameter('lastIdImported', $lastIdImported)
-			//->setParameter('depositID', $depositID)
-			->setMaxResults(100);
+			->setMaxResults($Count);
 		//ORDER BY d.id ASC
 
+		$results2 = $query->getResult();
+		
+		$results->setLastUpdate(new \DateTime());
+		$results->setCurrent(($lastIdImported+count($results2)))
 		//echo "<pre>";	
 		//var_dump($query->getResult());
 		//echo "</pre>";	
-		dump($query->getResult());
+		dump(count($results2));
 		exit();
 		$results = $query->getResult();
 
