@@ -21,10 +21,12 @@ class DefaultController extends Controller
     	 //em = $this->getDoctrine()->getManager();
     	$results = $this->getDoctrine()->getManager()->getRepository('Getresponse360\GetresponseBundle\Entity\Settings')->findOneBy(array('id' => '0')); //getAny()->getOneOrNullResult();
 
-		$lastIdImported = ($results->getCurrent() % 500); //Current count of imported
+    	$emReplicator = $this->getDoctrine()->getManager('goptions_platform');
+    	$total = $emReplicator->createQuery('SELECT COUNT(o) as gcount FROM Getresponse360ReplicatorBundle:Positions o')->getSingleScalarResult();
+
+		$lastIdImported = ($results->getCurrent() % $total); //Current count of imported
 		//echo $lastIdImported;
 		$Count = $results->getSize();
-    	$emReplicator = $this->getDoctrine()->getManager('goptions_platform');
     	$query = $emReplicator->createQuery(
 				'SELECT o.id as optionId, p.id as positionId, a.id
 				FROM Getresponse360ReplicatorBundle:Positions o
@@ -37,9 +39,9 @@ class DefaultController extends Controller
 		//ORDER BY d.id ASC
 
 		$results2 = $query->getResult();
-		
+
 		$results->setLastUpdate(new \DateTime());
-		$results->setCurrent(($lastIdImported+count($results2)))
+		$results->setCurrent(($lastIdImported+count($results2)) % $total);
 		//echo "<pre>";	
 		//var_dump($query->getResult());
 		//echo "</pre>";	
