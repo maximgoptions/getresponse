@@ -10,14 +10,14 @@ use Getresponse360\ReplicatorBundle\Entity;
 use Getresponse360\ReplicatorBundle\Services;
 use Getresponse360\GetresponseBundle\Entity as MyEntities;
 
-class DefaultController extends Controller
+class GetResponseController extends Controller
 {
 	private $NewCount = null;
 	private $SavedCount = null;
 	private $CID = null;
 	private $Last = null;
     /**
-     * @Route("/test")
+     * @Route("/getresponse")
      * @Template()
      */
     public function indexAction()
@@ -48,11 +48,10 @@ class DefaultController extends Controller
 		foreach($results2 as $customerId) {
 		$this->CID=$customerId['id'];
 
-dump($this->val(0));
-		/*if ($this->val(0)!=$this->val2(0)) { $this->update($this->val(0)); }
+		if ($this->val(0)!=$this->val2(0)) { $this->update($this->val(0)); }
 		else if ($this->val(1)!=$this->val2(1)) { $this->update($this->val(1)); }
 		else if ($this->val(2)!=$this->val2(2)) { $this->update($this->val(2)); }
-		else if ($this->val(3)!=$this->val2(3)) { $this->update($this->val(3)); }*/
+		else if ($this->val(3)!=$this->val2(3)) { $this->update($this->val(3)); }
 
 		$this->NewCount=null; //Invalidate previous results
 		$this->SavedCount=null;
@@ -76,31 +75,39 @@ dump($this->val(0));
     {
     	if ($InsertNew==-1)
     	{
+    	//Create new entity
     	$emReplicator=$this->getDoctrine()->getManager();
 		$Saved = new MyEntities\SavedUser();
 		$Saved->setId($this->CID);
-		$Saved->setDepositCount($this->val(0));
-		$Saved->setPositionsCount($this->val(1));
-		$Saved->setWithdrawalCount($this->val(2));
-		$Saved->setUserHandler($this->val(3));
+		$Saved->setDepositCount(max($this->val2(0),0));
+		$Saved->setPositionsCount(max($this->val2(1),0));
+		$Saved->setWithdrawalCount(max($this->val2(2),0));
+		$Saved->setUserHandler(max($this->val2(3),0));
 		$emReplicator->persist($Saved);
 		$emReplicator->flush();
-
-    		/*$emReplicator=$this->getDoctrine()->getManager();
-    		$this->NewCount = $emReplicator->createQuery('INSERT INTO `last_updated` (`customer_id`, `deposit_count`, `positions_count`, `withdrawal_count`, `user_handler`) VALUES (:C, :D, :W, :U, :P)')
-			->setParameter('C', $this->CID)
-			->setParameter('D', $this->val(0))
-			->setParameter('W', $this->val(1))
-			->setParameter('U', $this->val(2))
-			->setParameter('P', $this->val(3))->execute();*/
+		$this->GetResponse();
     	}
     	else
     	{
-		//echo "Old<br>";
+    	//Update existing entity
+    	$emReplicator=$this->getDoctrine()->getManager();
+    	$customer = $emReplicator->getRepository('Getresponse360\ReplicatorBundle\Entity\Customer')->findOneBy(array('id' => $this->CID));
+    	$customer->setDepositCount(max($this->val2(0),0));
+		$customer->setPositionsCount(max($this->val2(1),0));
+		$customer->setWithdrawalCount(max($this->val2(2),0));
+		$customer->setUserHandler(max($this->val2(3),0));
+		$emReplicator->persist($customer);
+		$emReplicator->flush();
+		$this->GetResponse(false);
     	}
     }
 
-    function val2($b)
+    function GetResponse($New = true)
+    {
+
+    }
+
+    function val2($b) //Deposit count, position count, withdrawal count, user handler
     {
     	$Arr[]="cC"; $Arr[]="pC"; $Arr[]="wC"; $Arr[]="uH";
     	$In=($Arr[$b]);
@@ -123,17 +130,17 @@ dump($this->val(0));
 
     function val($a)
     {
+    	$Arr[]="dC"; $Arr[]="pC"; $Arr[]="wC"; $Arr[]="UID";
+    	$In=($Arr[$a]);
     	if (!isset($this->SavedCount)) //SavedUser
     	{
     		$emReplicator=$this->getDoctrine()->getManager();
-    		$this->SavedCount = $emReplicator->createQuery('SELECT s.depositCount, s.withdrawalCount, s.positionsCount, s.userHandler FROM Getresponse360GetresponseBundle:SavedUser s WHERE s.customerId = :customer')
+    		$this->SavedCount = $emReplicator->createQuery('SELECT s.depositCount as dC, s.withdrawalCount as wC, s.positionsCount as pC, s.userHandler as UID FROM Getresponse360GetresponseBundle:SavedUser s WHERE s.customerId = :customer')
 			->setParameter('customer', $this->CID)->getResult();
-
-			dump($this->SavedCount);
 		}
 		//dump($this->SavedCount);
-		return $this->SavedCount;
-		//if (isset($this->SavedCount[0][$a])) {return $this->SavedCount[0][$a];} else {return -1;}
+		//return $this->SavedCount;
+		if (isset($this->SavedCount[0][$In])) {return $this->SavedCount[0][$In];} else {return -1;}
 
     	//global $Test;
     	//dump($this->Test);
