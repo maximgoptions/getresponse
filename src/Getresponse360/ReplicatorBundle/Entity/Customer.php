@@ -80,6 +80,13 @@ class Customer
     /**
      * @var \DateTime
      *
+     * @ORM\Column(name="birthday", type="date", nullable=false)
+     */
+    private $birthday;
+
+    /**
+     * @var \DateTime
+     *
      * @ORM\Column(name="lastLoginDate", type="datetime")
      */
     private $lastLoginDate;
@@ -852,6 +859,29 @@ class Customer
     public function getUser()
     {
         return $this->user;
+    }
+
+    /**
+     * Set birthday
+     *
+     * @param \DateTime $birthday
+     * @return Customers
+     */
+    public function setBirthday($birthday)
+    {
+        $this->birthday = $birthday;
+
+        return $this;
+    }
+
+    /**
+     * Get birthday
+     *
+     * @return \DateTime 
+     */
+    public function getBirthday()
+    {
+        return $this->birthday;
     }
 
     /**

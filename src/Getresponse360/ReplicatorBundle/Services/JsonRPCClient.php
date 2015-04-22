@@ -1,6 +1,6 @@
 <?php
 
-namespace BOS\GetResponseBundle\Services;
+namespace Getresponse360\ReplicatorBundle\Services;
 
 /**
  * jsonRPCClient.php

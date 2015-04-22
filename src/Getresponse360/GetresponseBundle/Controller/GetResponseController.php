@@ -5,7 +5,7 @@ namespace Getresponse360\GetresponseBundle\Controller;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-use Getresponse360\GetresponseBundle\Services\JsonRPCClient;
+use Getresponse360\ReplicatorBundle\Services\JsonRPCClient;
 use Getresponse360\ReplicatorBundle\Entity;
 use Getresponse360\ReplicatorBundle\Services;
 use Getresponse360\GetresponseBundle\Entity as MyEntities;
@@ -16,6 +16,7 @@ class GetResponseController extends Controller
 	private $SavedCount = null;
 	private $CID = null;
 	private $Last = null;
+	private $Client = null;
     /**
      * @Route("/getresponse")
      * @Template()
@@ -53,7 +54,7 @@ class GetResponseController extends Controller
 		else if ($this->val(2)!=$this->val2(2)) { $this->update($this->val(2)); }
 		else if ($this->val(3)!=$this->val2(3)) { $this->update($this->val(3)); }
 
-		$this->NewCount=null; //Invalidate previous results
+		$this->NewCount=null; //Invalidate previous results from lazy initialization
 		$this->SavedCount=null;
 		$lastIdImported++;
 		}
@@ -91,7 +92,7 @@ class GetResponseController extends Controller
     	{
     	//Update existing entity
     	$emReplicator=$this->getDoctrine()->getManager();
-    	$customer = $emReplicator->getRepository('Getresponse360\ReplicatorBundle\Entity\Customer')->findOneBy(array('id' => $this->CID));
+    	$customer = $emReplicator->getRepository(MyEntities\SavedUser)->findOneBy(array('id' => $this->CID));
     	$customer->setDepositCount(max($this->val2(0),0));
 		$customer->setPositionsCount(max($this->val2(1),0));
 		$customer->setWithdrawalCount(max($this->val2(2),0));
@@ -104,7 +105,102 @@ class GetResponseController extends Controller
 
     function GetResponse($New = true)
     {
+   	$api_key = '2ba6eb57e29d4034b35f1b8755ab0700'; //Our API from the dashboard
+   	$camp = 'VzzHx'; //Campaign
+    if (!isset($this->Client)) { $this->Client = new JsonRPCClient('http://api.getresponse360.com/goptions1'); } //Lazy initialization for communication with getresponse360
 
+	$emReplicator = $this->getDoctrine()->getManager('goptions_platform');
+    $Customer = $emReplicator->getRepository('Getresponse360\ReplicatorBundle\Entity\Customer')->findOneBy(array('id' => $this->CID));
+
+    //Set customs fields, they will be either used by set_contact_customs or add_contant, depending on whether the user exists or not (add_contact takes time to verify the user thus deleting and reinserting is not a viable option)
+	$Customs = array (
+            array( "name" => "phone", "content" => $Customer->getPhone()),
+            array( "name" => "country", "content" => $Customer->getCountry()),
+            array( "name" => "language", "content" => $Customer->getSiteLanguage()),
+            array( "name" => "birth_date", "content" => $Customer->getBirthday()),
+            array( "name" => "reg_date", "content" => $Customer->getRegTime()),
+            array( "name" => "last_activity", "content" => $Customer->getLastTimeActive()),
+            array( "name" => "last_login", "content" => $Customer->getLastLoginDate()),
+            array( "name" => "last_balance", "content" => $Customer->getLastAccountBalance()),
+            array( "name" => "last_withdrawal", "content" => ""),
+            array( "name" => "last_deposit", "content" => ""), //verify these with delphine
+            array( "name" => "bonus", "content" => "0"), //get bonus sum
+            array( "name" => "idcustomer", "content" => $Customer->getId()),
+            array( "name" => "employeeinchargeid", "content" => $Customer->getEmployeeInChargeId()),
+            array( "name" => "account_type", "content" => $Customer->getAccountType()),
+            array( "name" => "demo", "content" => $Customer->getIsDemo()),
+            array( "name" => "suspended", "content" => $Customer->getIsSuspended())
+        );
+
+	if (!$New) //If the user alread exists we modify it (provided the actual data has changed), otherwise we add a new user
+	{
+	$result = $this->Client->set_contact_customs(
+	    $api_key,
+	    array (
+	        "contact" => array ( "campaign" => $camp, "email" => $Customer->getEmail() ),
+	        "customs" => $Customs
+	    )
+	);
+	}
+	else
+	{
+	$result = $this->Client->add_contact(
+	    $api_key,
+	    array (
+	        "campaign" => $camp,
+	        "first_name" => $Customer->getFirstName(),
+	        "last_name" => $Customer->getLastName(),
+	        "email" => $Customer->getEmail(),
+	        "customs" => $Customs
+	    )
+	);
+	}
+	dump($result);
+	exit();
+/*
+	first name
+last name
+email address
+phone
+Country
+language
+birth date
+registration date
+last time activity
+last time login
+last balance
+last withdrawal
+last deposit
+bonus
+idcustomer
+employeeinchargeid
+account type
+demo 
+suspended
+
+	# add contact to the campaign
+	$result = $this->Client->add_contact(
+		$api_key,
+		array (
+			'campaign'  => 'VzzHx', //Campaign token, no need to waste calls fetching this staic property
+	    	
+			# basic info
+			'name'      => 'Test',
+	    	'email'     => 'test@test.test',
+
+			# custom fields
+			'customs' => array(
+		        array(
+		            'name'       => 'likes_to_drink',
+		            'content'    => 'tea'
+		        ),
+				array(
+		            'name'       => 'likes_to_eat',
+		            'content'    => 'steak'
+		        )
+		    )
+		)
+	);*/
     }
 
     function val2($b) //Deposit count, position count, withdrawal count, user handler
