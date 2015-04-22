@@ -23,14 +23,13 @@ class GetResponseController extends Controller
      */
     public function indexAction()
     {
-    	 //em = $this->getDoctrine()->getManager();
     	$SetManager = $this->getDoctrine()->getManager();
     	$Settings = $SetManager->getRepository('Getresponse360\GetresponseBundle\Entity\Settings')->findOneBy(array('id' => '0')); //getAny()->getOneOrNullResult();
     	$Current = $Settings->getCurrent();
     	$emReplicator = $this->getDoctrine()->getManager('goptions_platform');
     	$Result = $emReplicator->createQuery('SELECT COUNT(c) as ccount, CURRENT_TIMESTAMP() as time FROM Getresponse360ReplicatorBundle:Customer c')->getResult();
-    	$total = $Result[0]['ccount']; //fetch gcount
-    	$last = $Result[0]['time'];
+    	$total = $Result[0]['ccount']; //Total number of customers
+    	$last = $Result[0]['time']; //Current timestamp
     	$this->Last = $last;
 
 		$lastIdImported = ($Current % $total); //Current count of imported
@@ -43,11 +42,11 @@ class GetResponseController extends Controller
 			) 
 			->setParameter('lastIdImported', $lastIdImported)
 			->setParameter('lastUpdated', $last)
-			->setMaxResults(50);
+			->setMaxResults($Count);
 
 		$results2 = $query->getResult();
 		foreach($results2 as $customerId) {
-		$this->CID=$customerId['id'];
+		$this->CID=$customerId['id']; //Set current customerId to use within val/val2
 
 		if ($this->val(0)!=$this->val2(0)) { $this->update($this->val(0)); }
 		else if ($this->val(1)!=$this->val2(1)) { $this->update($this->val(1)); }
@@ -62,21 +61,16 @@ class GetResponseController extends Controller
 		$Settings->setCurrent($lastIdImported % $total);
 		$SetManager->persist($Settings);
 		$SetManager->flush();
-		//echo "<pre>";	
-		//var_dump($query->getResult());
-		//echo "</pre>";	
-		dump(count($results2));
-		exit();
-		//$results = $query->getResult();
 
+		$results = array ("success"=>"1");
         return array('name' => $results);
     }
 
-    function update($InsertNew)
+    function update($InsertNew) //Update the entity in our local database (not the replicator) to check against the newest data to determine if we need to update getresponse360 with new data
     {
     	if ($InsertNew==-1)
     	{
-    	//Create new entity
+    	//Create new SavedUser entity
     	$emReplicator=$this->getDoctrine()->getManager();
 		$Saved = new MyEntities\SavedUser();
 		$Saved->setId($this->CID);
@@ -90,7 +84,7 @@ class GetResponseController extends Controller
     	}
     	else
     	{
-    	//Update existing entity
+    	//Update existing SavedUser entity
     	$emReplicator=$this->getDoctrine()->getManager();
     	$customer = $emReplicator->getRepository(MyEntities\SavedUser)->findOneBy(array('id' => $this->CID));
     	$customer->setDepositCount(max($this->val2(0),0));
@@ -109,8 +103,8 @@ class GetResponseController extends Controller
    	$camp = 'VzzHx'; //Campaign
     if (!isset($this->Client)) { $this->Client = new JsonRPCClient('http://api.getresponse360.com/goptions1'); } //Lazy initialization for communication with getresponse360
 
-	$emReplicator = $this->getDoctrine()->getManager('goptions_platform');
-    $Customer = $emReplicator->getRepository('Getresponse360\ReplicatorBundle\Entity\Customer')->findOneBy(array('id' => $this->CID));
+	$emReplicator = $this->getDoctrine()->getManager('goptions_platform'); //Our replicator database
+    $Customer = $emReplicator->getRepository('Getresponse360\ReplicatorBundle\Entity\Customer')->findOneBy(array('id' => $this->CID)); //Fetch customer by ID
 
     //Set customs fields, they will be either used by set_contact_customs or add_contant, depending on whether the user exists or not (add_contact takes time to verify the user thus deleting and reinserting is not a viable option)
 	$Customs = array (
@@ -130,14 +124,14 @@ class GetResponseController extends Controller
             array( "name" => "account_type", "content" => $Customer->getAccountType()),
             array( "name" => "demo", "content" => $Customer->getIsDemo()),
             array( "name" => "suspended", "content" => $Customer->getIsSuspended())
-        );
+    );
 
 	if (!$New) //If the user alread exists we modify it (provided the actual data has changed), otherwise we add a new user
 	{
 	$result = $this->Client->set_contact_customs(
 	    $api_key,
 	    array (
-	        "contact" => array ( "campaign" => $camp, "email" => $Customer->getEmail() ),
+	        "contact" => array ( "campaign" => $camp, "email" => $Customer->getEmail() ), //Email is not unique according to the API since the same email can exist across multiple campaigns but campaign+email is.
 	        "customs" => $Customs
 	    )
 	);
@@ -155,59 +149,13 @@ class GetResponseController extends Controller
 	    )
 	);
 	}
-	dump($result);
-	exit();
-/*
-	first name
-last name
-email address
-phone
-Country
-language
-birth date
-registration date
-last time activity
-last time login
-last balance
-last withdrawal
-last deposit
-bonus
-idcustomer
-employeeinchargeid
-account type
-demo 
-suspended
-
-	# add contact to the campaign
-	$result = $this->Client->add_contact(
-		$api_key,
-		array (
-			'campaign'  => 'VzzHx', //Campaign token, no need to waste calls fetching this staic property
-	    	
-			# basic info
-			'name'      => 'Test',
-	    	'email'     => 'test@test.test',
-
-			# custom fields
-			'customs' => array(
-		        array(
-		            'name'       => 'likes_to_drink',
-		            'content'    => 'tea'
-		        ),
-				array(
-		            'name'       => 'likes_to_eat',
-		            'content'    => 'steak'
-		        )
-		    )
-		)
-	);*/
     }
 
-    function val2($b) //Deposit count, position count, withdrawal count, user handler
+    function val2($b) //Fetch deposit count, position count, withdrawal count, user handler from the replicator $b is an integer with 0 for "deposit count" and 3 for "user handler".
     {
     	$Arr[]="cC"; $Arr[]="pC"; $Arr[]="wC"; $Arr[]="uH";
     	$In=($Arr[$b]);
-    	if (!isset($this->NewCount)) 
+    	if (!isset($this->NewCount)) //Initialize the results for this customer if they don't exist.
     	{
     		$emReplicator=$this->getDoctrine()->getManager('goptions_platform');
     		$this->NewCount = $emReplicator->createQuery(
@@ -224,59 +172,17 @@ suspended
 		return $this->NewCount[0][$In];
 	}
 
-    function val($a)
+    function val($a) //Fetch deposit count, position count, withdrawal count, user handler from our local database to determine what data we have updated getresponse360 with previously, if nothing exists -1 is returned to create a new user.
     {
     	$Arr[]="dC"; $Arr[]="pC"; $Arr[]="wC"; $Arr[]="UID";
     	$In=($Arr[$a]);
-    	if (!isset($this->SavedCount)) //SavedUser
+    	if (!isset($this->SavedCount)) //Initialize the results for this customer if they don't exist.
     	{
     		$emReplicator=$this->getDoctrine()->getManager();
     		$this->SavedCount = $emReplicator->createQuery('SELECT s.depositCount as dC, s.withdrawalCount as wC, s.positionsCount as pC, s.userHandler as UID FROM Getresponse360GetresponseBundle:SavedUser s WHERE s.customerId = :customer')
 			->setParameter('customer', $this->CID)->getResult();
 		}
-		//dump($this->SavedCount);
-		//return $this->SavedCount;
-		if (isset($this->SavedCount[0][$In])) {return $this->SavedCount[0][$In];} else {return -1;}
+		if (isset($this->SavedCount[0][$In])) {return $this->SavedCount[0][$In];} else {return -1;} //Return the value or -1 to create a new user if it doesn't exist
 
-    	//global $Test;
-    	//dump($this->Test);
-    	/*global $valResults;
-    	global $emReplicator;
-    	dump($emReplicator);
-    	if (!isset($valResults)) { $valResults=0; $emReplicator->createQuery('SELECT COUNT(c) as ccount, CURRENT_TIMESTAMP() as time FROM Getresponse360ReplicatorBundle:Customer c')->getResult(); } //Lazy initizaltion
-    	$valResults++;
-    	return $valResults;*/
     }
-
-    /**
-	* Get from replicator 500 results each time
-	*/
-	public function getTableFromReplicator($lastIdImported, $tableName) {
-		$emReplicator = $this->getDoctrine()->getManager('goptions_platform');
-		if($tableName == 'CustomerBalance') { 
-			// if entity name is CustomerBalance
-			$query = $emReplicator->createQuery(
-				'SELECT d FROM Getresponse360ReplicatorBundle:'.$tableName.' d
-				WHERE d.customerid  >= :lastIdImported
-				ORDER BY d.customerid ASC'
-			) 
-			->setParameter('lastIdImported', $lastIdImported)
-			->setMaxResults(500);
-		}
-		else { 
-			$query = $emReplicator->createQuery(
-				'SELECT d FROM Getresponse360ReplicatorBundle:'.$tableName.' d
-				WHERE d.customerId  >= :lastIdImported
-				ORDER BY d.customerId ASC'
-			) 
-			->setParameter('lastIdImported', $lastIdImported)
-			->setMaxResults(500);
-
-		}
-
-		
-		$results = $query->getResult();
-
-		return $results;
-	}
 }
