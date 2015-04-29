@@ -14,6 +14,7 @@ class GetResponseController extends Controller
 {
 	private $NewCount = null;
 	private $SavedCount = null;
+	private $SavedSum = null;
 	private $CID = null;
 	private $Last = null;
 	private $Client = null;
@@ -110,30 +111,31 @@ class GetResponseController extends Controller
 
     //Set customs fields, they will be either used by set_contact_customs or add_contant, depending on whether the user exists or not (add_contact takes time to verify the user thus deleting and reinserting is not a viable option)
 	$Customs = array (
-            array( "name" => "phone", "content" => $Customer->getPhone()),
+            array( "name" => "phone", "content" => 1/*$Customer->getPhone()*/),
             array( "name" => "country", "content" => $Customer->getCountry()),
-            array( "name" => "language", "content" => $Customer->getSiteLanguage()),
-            array( "name" => "birth_date", "content" => $Customer->getBirthday()),
-            array( "name" => "reg_date", "content" => $Customer->getRegTime()),
-            array( "name" => "last_activity", "content" => $Customer->getLastTimeActive()),
-            array( "name" => "last_login", "content" => $Customer->getLastLoginDate()),
+            array( "name" => "language", "content" => ($Customer->getSiteLanguage()=="" ? "Not selected" : $Customer->getSiteLanguage())),
+            array( "name" => "birth_date", "content" => ($this->InvalidDates($Customer->getBirthday()))), //Fix bugs
+            array( "name" => "reg_date", "content" => ($this->InvalidDates($Customer->getRegTime()))),
+            array( "name" => "last_activity", "content" => ($this->InvalidDates($Customer->getLastTimeActive()))),
+            array( "name" => "last_login", "content" => ($this->InvalidDates($Customer->getLastLoginDate()))), //For all dates
             array( "name" => "last_balance", "content" => $Customer->getLastAccountBalance()),
-            array( "name" => "last_withdrawal", "content" => ""),
-            array( "name" => "last_deposit", "content" => ""), //verify these with delphine
-            array( "name" => "bonus", "content" => "0"), //get bonus sum
+            array( "name" => "last_withdrawal", "content" => $this->val3(0)),
+            array( "name" => "last_deposit", "content" => $this->val3(1)), //verify these with delphine
+            array( "name" => "bonus", "content" => $this->val3(2)), //get bonus sum
             array( "name" => "idcustomer", "content" => $Customer->getId()),
             array( "name" => "employeeinchargeid", "content" => $Customer->getEmployeeInChargeId()),
             array( "name" => "account_type", "content" => $Customer->getAccountType()),
             array( "name" => "demo", "content" => $Customer->getIsDemo()),
             array( "name" => "suspended", "content" => $Customer->getIsSuspended())
     );
+	$this->SavedSum=null;
 
 	if (!$New) //If the user alread exists we modify it (provided the actual data has changed), otherwise we add a new user
 	{
 	$result = $this->Client->set_contact_customs(
 	    $api_key,
 	    array (
-	        "contact" => array ( "campaign" => $camp, "email" => $Customer->getEmail() ), //Email is not unique according to the API since the same email can exist across multiple campaigns but campaign+email is.
+	        "contact" => array ( "campaign" => $camp, "email" => ($this->VerifyEmail($Customer->getEmail())) ), //Email is not unique according to the API since the same email can exist across multiple campaigns but campaign+email is.
 	        "customs" => $Customs
 	    )
 	);
@@ -144,13 +146,66 @@ class GetResponseController extends Controller
 	    $api_key,
 	    array (
 	        "campaign" => $camp,
-	        "name" => ($Customer->getFirstName()." ".$Customer->getLastName()),
-	        "email" => $Customer->getEmail(),
-	        "customs" => '[{"name": "name_1_value","content": "content_1_value"}]'
+	        "name" => ($this->ArabicNames(($Customer->getFirstName()." ".$Customer->getLastName()))),
+	        "email" => ($this->VerifyEmail($Customer->getEmail())),
+	        "customs" => $Customs
 	    )
 	);
 	}
     }
+
+    function InvalidDates($d)
+    {
+    	$Str = $d->format('Y-m-d H:i:s');
+    	if ($Str=="-0001-11-30 00:00:00") { return "2001-11-30 00:00:00"; }
+    	return $Str;
+    }
+
+    function VerifyEmail($em)
+    {
+   		$exp = "^[a-z\'0-9]+([._-][a-z\'0-9]+)*@([a-z0-9]+([._-][a-z0-9]+))+$";
+   		$Em = (explode("@",$em)); //array_pop
+    	if (!eregi($exp,$em)) {return "noemail@google.com";}
+    	if(!checkdnsrr(array_pop($Em),"MX")) {return "noemail@google.com";}
+    	return $em;
+    }
+
+    function ArabicNames($n)
+    {
+    	return preg_replace("/[\^<,\"@\/\{\}\(\)\*\$%\?=>:\|;#]+/i", "", $n);
+    }
+
+    function val3($b) //Fetch amount for last withdraw/deposit with bonus which permanetly returns 0 for the moment
+    {
+    	$Arr[]="cC"; $Arr[]="pC"; $Arr[]="wC";
+    	$In=($Arr[$b]);
+    	if (!isset($this->SavedSum)) //Initialize the results for this customer if they don't exist.
+    	{
+    		$emReplicator=$this->getDoctrine()->getManager('goptions_platform');
+
+    		$inner_q = $emReplicator->createQuery("SELECT p.amount FROM Getresponse360ReplicatorBundle:CustomerDeposit p WHERE p.customerId = :lastIdImported AND p.requestTime < :lastUpdated AND NOT p.paymentMethod = :bonus ORDER BY p.id DESC")
+			->setParameter('lastIdImported', $this->CID)
+			->setParameter('lastUpdated', $this->Last)
+		    ->setMaxResults(1)
+		    ->getDQL();
+
+    		$this->SavedSum = $emReplicator->createQuery(
+			'SELECT c.amount as cC, 
+			(1) as pC, 
+			(SELECT SUM(w.amount) FROM Getresponse360ReplicatorBundle:CustomerDeposit w WHERE w.customerId = :lastIdImported AND w.requestTime < :lastUpdated AND w.paymentMethod = :bonus) as wC
+			FROM Getresponse360ReplicatorBundle:Withdrawal c 
+			WHERE c.customerId = :lastIdImported 
+			AND c.type = :with
+			AND c.requestTime < :lastUpdated
+			ORDER BY c.id DESC')
+		->setParameter('lastIdImported', $this->CID)
+		->setParameter('lastUpdated', $this->Last)
+		->setParameter('bonus', "Bonus")
+		->setParameter('with', "withdrawal")
+		->setMaxResults(1)->getResult();
+		}
+		if (isset($this->SavedSum[0][$In])) {return $this->SavedSum[0][$In];} else {return 0;} //Return the value or -1 to create a new user if it doesn't exist
+	}
 
     function val2($b) //Fetch deposit count, position count, withdrawal count, user handler from the replicator $b is an integer with 0 for "deposit count" and 3 for "user handler".
     {
