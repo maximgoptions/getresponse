@@ -168,7 +168,7 @@ class JsonRPCClient
 
         // check if decoding json generated any errors
         $jsonErrorMsg = $this->getJsonLastErrorMsg();
-        $this->validate( !is_null($jsonErrorMsg), $jsonErrorMsg . ': ' . $responseMessage);
+        $this->validate( (!is_null($jsonErrorMsg) && !$jsonErrorMsg=="No error"), $jsonErrorMsg . ': ' . $responseMessage);
 
         // check if response is correct
         $this->validate(empty($responseDecoded['id']), 'Invalid response data structure: ' . $responseMessage);
@@ -252,7 +252,7 @@ class JsonRPCClient
 
         if ($pFailed)
         {
-            throw new \Exception("test".$pErrMsg);
+            throw new \Exception($pErrMsg);
         }
     }
 

@@ -63,6 +63,8 @@ class GetResponseController extends Controller
 		$SetManager->flush();
 
 		$results = array ("success"=>"1");
+		echo "Success";
+		exit(1);
         return array('name' => $results);
     }
 
@@ -99,8 +101,8 @@ class GetResponseController extends Controller
 
     function GetResponse($New = true)
     {
-   	$api_key = '2ba6eb57e29d4034b35f1b8755ab0700'; //Our API from the dashboard
-   	$camp = 'VzzHx'; //Campaign
+   	$api_key = '06e7de6d3450318fee796313f7a6aaa1'; //Our API from the dashboard
+   	$camp = '2'; //Campaign
     if (!isset($this->Client)) { $this->Client = new JsonRPCClient('http://api.getresponse360.com/goptions1'); } //Lazy initialization for communication with getresponse360
 
 	$emReplicator = $this->getDoctrine()->getManager('goptions_platform'); //Our replicator database
@@ -142,10 +144,9 @@ class GetResponseController extends Controller
 	    $api_key,
 	    array (
 	        "campaign" => $camp,
-	        "first_name" => $Customer->getFirstName(),
-	        "last_name" => $Customer->getLastName(),
+	        "name" => ($Customer->getFirstName()." ".$Customer->getLastName()),
 	        "email" => $Customer->getEmail(),
-	        "customs" => $Customs
+	        "customs" => '[{"name": "name_1_value","content": "content_1_value"}]'
 	    )
 	);
 	}
